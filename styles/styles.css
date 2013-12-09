@@ -1,0 +1,228 @@
+/******************************
+	Module report stlyes
+******************************/
+
+/* Main and title */
+
+* {
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
+body {
+	background: #e3e3e3;
+	margin: 0; padding: 0;
+	font-family: verdana,helvetica,arial,sans-serif;
+}
+
+.main_title {
+	width: 2200px;
+	background-color: #474747;
+	color: #fff;
+	margin: 0px 0px 10px 0px;
+	font-family: verdana,helvetica,arial,sans-serif;
+	font-weight: normal;
+	padding: 5px 0px 5px 10px;
+}
+
+/* Tab styles */
+
+#tabs {
+	width: 2200px;
+	margin: 0 auto;
+}
+
+	#tabs .ui-widget-header,  { background-color: #bdbdbd; border-color: #828282;}
+
+		
+		
+		#tabs .ui-state-default, #tabs .ui-widget-content .ui-state-default, #tabs .ui-widget-header .ui-state-default  {
+			border: none;
+			background: none;
+		}
+		
+		#tabs .ui-state-default a:hover {
+			color: #eee;
+		}
+		
+		 #tabs .ui-widget-header .ui-state-active{
+			border-top: 1px solid #828282;
+			border-left: 1px solid #828282;
+			border-right: 1px solid #828282;
+			background-color:#eee;
+			background-image: none;
+			margin-top: 1px;
+		}
+		
+			#tabs .ui-widget-header .ui-state-active a {color: #474747;}
+		
+	#tabs .ui-widget-content { background-image: none; background-color: #eee; font-size: 12px;}
+	
+/* List styles */
+	.data-table {
+		overflow: auto;
+		margin:0px;
+		padding: 0px;
+	}
+	
+		.labels {
+			overflow: auto;
+		}
+		
+		.data-set {
+			overflow: auto;
+		}
+	
+		.labels li { 
+			float: left;
+			list-style: none;
+			width: 75px;
+			background: #bdbdbd;
+			font-size: 14px;
+			padding: 3px 0px 3px 4px;
+			border: 1px solid #fff;
+		}
+		.data-set li {
+			float: left; 
+			list-style: none; 
+			width: 75px; 
+			padding:2px 0px 2px 4px; 
+			background-color: #e3e3e3; 
+			border: 1px solid #fff;
+			min-height: 14px;
+		}
+		
+			.data-table .cat {
+				width: 150px;
+			}
+			
+			.data-set li.data {
+				text-align: center; position: relative;
+			}
+				.data-set li.data .info {
+					
+				}
+			
+				.data-set li.active {
+					background: #ccc;
+					cursor: pointer;
+				}
+					.data-set li.active:hover {
+						background: #999;
+						color: #fff;
+					}
+				.data-set li.active .arrow { 
+					width: 30px;
+					height: 18px;
+					background: url("images/arrow.png") no-repeat;
+					position: absolute;
+					bottom: -16px;
+					left: 25px;
+				}
+				
+				.data-set li.empty {
+					background:transparent url('images/emptyIcon.png') no-repeat 35px 5px; 
+				}
+		
+		#module-list {
+			
+			
+		}
+		
+		.courseBoxWrapper {
+		
+		}
+		
+			.courseBoxWrapper .courseBox {
+				background: transparent url('images/bg-g.png') repeat;
+				-moz-border-radius: 5px;
+				-webkit-border-radius: 5px;
+				border-radius: 5px;
+				padding: 5px;
+			}
+		
+				.courseBoxWrapper .courseBox .arrow {
+					
+					width: 0px;
+					height: 0px;
+					position: absolute;
+					border-color: transparent transparent #000 transparent;
+					border-style: solid;
+					border-width: 10px;
+					top: -20px;
+					left: 85px;
+					opacity: .45;   
+				}
+				
+				.courseBoxWrapper .courseBox .innerArrow {
+					width: 0px;
+					height: 0px;
+					position: absolute;
+					border-color: transparent transparent #ddd transparent;
+					border-style: solid;
+					border-width: 9px;
+					top: -13px;
+					left: 86px;
+					opacity: .9;
+				}	
+
+				.courseBoxWrapper .courseBox .inner {
+					background: #ddd;
+					border-radius: 4px;
+					opacity: .90;
+					width: 180px;
+				}
+		
+					.courseBoxWrapper table {
+						width: 100%;
+						border-collapse: collapse;
+						font-size: 12px;
+					}
+			
+						.courseBoxWrapper td.name {
+							width: 75%;
+							padding: 5px;
+							background: #eee;
+						}
+						
+						.courseBoxWrapper td.name:hover {
+							background: #ccc;
+						}
+							
+							.courseBoxWrapper td.name a {
+								text-decoration: none;
+								font-size: 1.1em;
+							}
+						
+						.courseBoxWrapper  td.count {
+							background: #999;
+							color: #fff;
+							padding: 5px;
+							text-align: center;
+						}
+
+		.courses {
+			margin-top: 14px
+		}
+		
+			.courses ul {
+				
+			}
+				.courses ul li { 
+					list-style: none;
+					background: #e3e3e3;
+					width: 100%;
+					border: 1px solid #fff;
+					padding: 3px 0px 3px 10px;
+					font-weight: bold;
+				}
+					.courses ul li div {
+						background: url("images/ui-icons_228ef1_256x240.png") no-repeat -244px -130px;
+						width: 16px;
+						height: 16px;
+						float: left;
+					}
+
+/* Utility classes */
+.clear {clear: both;}
