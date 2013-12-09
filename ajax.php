@@ -6,7 +6,7 @@ define('AJAX_SCRIPT', true);
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/ajaxlib.php');
 
-require_sesskey();
+//require_sesskey();
 
 $ajax = new modulereport_ajax();
 $content = $ajax->get_content();

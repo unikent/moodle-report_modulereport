@@ -42,7 +42,7 @@ class modulereport_ajax {
         $content = new stdClass();
         $content->data = array();
 
-        $content->data=get_root_node();
+        $content->data=$this->get_root_node();
 
         return $content;
     }
@@ -59,11 +59,16 @@ LEFT OUTER JOIN mdl_course c
 ON c.category = cc2.id
 where cc.depth=1 
 group by cc.id;
-SQLDATA
+SQLDATA;
 
-        $data = $DB->get_records_sql($sql);
-
-        return $data;
+        $params = array();
+        $data = $DB->get_records_sql($sql,$params);
+        $array=array();
+        foreach ($data as $key=>$value) {
+            $value->children =  $this->get_children_node($value->id); 
+            array_push($array,$value);
+        }
+        return $array;
     }
     
     private function get_children_node($id) {
@@ -80,18 +85,20 @@ LEFT OUTER JOIN mdl_course c
 ON c.category = cc3.id
 where cc.id=:id
 group by cc2.id;
-SQLDATA
+SQLDATA;
 
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
 
-        foreach $data as $row {
-            $row->children =  get_children_node($row->id); 
-            $row->moduleCount =  get_modules_node($row->id); 
-            $row->courses =  get_courses_node($row->id); 
+        $array=array();
+        foreach ($data as $key=>$value) {
+            $value->children =  $this->get_children_node($value->id); 
+            $value->moduleCount =  $this->get_modules_node($value->id); 
+            $value->courses =  $this->get_courses_node($value->id); 
+            array_push($array,$value);
         }
 
-        return $data;
+        return $array;
 
 }
     
@@ -110,12 +117,16 @@ ON c.category = cc.id
 where cc.id=:id
 group by c.id
 ORDER BY c.shortname;
-SQLDATA
+SQLDATA;
 
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
 
-        return $data;
+        $array=array();
+        foreach ($data as $key=>$value) {
+            array_push($array,$value);
+        }
+        return $array;
 
     }
 
@@ -136,12 +147,15 @@ ON cc.depth<=cc2.depth and cc2.path like CONCAT (cc.path,'%')
 where cc.id=:id
 group by m.id
 ORDER BY m.name;
-SQLDATA
+SQLDATA;
 
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
 
-        return $data;
-
-}
+        $array=array();
+        foreach ($data as $key=>$value) {
+            array_push($array,$value);
+        }
+        return $array;
+    }
 }

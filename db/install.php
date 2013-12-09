@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-function xmldb_report_outline_install() {
+function xmldb_report_modulereport_install() {
     global $DB;
 
 }

@@ -36,7 +36,6 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         ),
 
-        'clonepermissionsfrom' => 'coursereport/outline:view',
     )
 );
 

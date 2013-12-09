@@ -10,5 +10,7 @@
 
 $string['modulereport'] = 'Module Usage Report';
 $string['pluginname'] = 'Module Usage Report';
+$string['modulereport:view'] = 'View Module usage report';
+
 
 
