@@ -77,7 +77,7 @@ SQLDATA;
         $sql = <<< SQLDATA
 SELECT cc2.id,cc2.name, count(DISTINCT c.id) totalModuleCount 
 FROM mdl_course_categories cc
-LEFT OUTER JOIN mdl_course_categories cc2
+JOIN mdl_course_categories cc2
 ON cc.depth=cc2.depth-1 and cc2.path like CONCAT (cc.path,'/%')
 LEFT OUTER JOIN mdl_course_categories cc3
 ON cc2.depth<=cc3.depth and cc3.path like CONCAT (cc2.path,'%')
@@ -114,7 +114,7 @@ JOIN mdl_modules m
 ON cm.module = m.id
 JOIN mdl_course_categories cc
 ON c.category = cc.id
-where cc.id=:id
+AND cc.id=:id
 group by c.id
 ORDER BY c.shortname;
 SQLDATA;
@@ -122,6 +122,7 @@ SQLDATA;
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
 
+//var_dump(array('sql'=>$sql,'params'=>$params,'data'=>$data,'tag'=>'1'));
         $array=array();
         foreach ($data as $key=>$value) {
             array_push($array,$value);
@@ -144,7 +145,7 @@ LEFT OUTER JOIN mdl_course_categories cc2
 ON c.category = cc2.id
 LEFT OUTER JOIN mdl_course_categories cc
 ON cc.depth<=cc2.depth and cc2.path like CONCAT (cc.path,'%')
-where cc.id=:id
+AND cc.id=:id
 group by m.id
 ORDER BY m.name;
 SQLDATA;
@@ -152,9 +153,10 @@ SQLDATA;
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
 
+//var_dump(array('sql'=>$sql,'params'=>$params,'data'=>$data,'tag'=>'2'));
         $array=array();
         foreach ($data as $key=>$value) {
-            array_push($array,$value);
+            array_push($array,array($value->name=>$value->cnt));
         }
         return $array;
     }
