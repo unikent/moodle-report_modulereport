@@ -6,6 +6,7 @@
 	require_login();
 	
 	$heading = get_string('modulereport', 'report_modulereport');
+    echo $OUTPUT->header();
 ?>
 <!doctype html>
 <html lang="en">
@@ -38,9 +39,23 @@
 	<script type="text/javascript">
 		$(function(){
 		    
-	var data = <?php echo file_get_contents($CFG->dataroot . '/modulereport/report.js') ?>;
+            var data = [];
 
-			// set up module list dialog
+            YUI().use("node", "io", "dump", "json-parse", function(Y) {
+                Y.log("GETTING DATA");
+
+                var callback = {
+
+                    timeout : 3000,
+                    method:"GET",
+                    data:{sesskey:M.cfg.sesskey},
+
+                    on : {
+                        success : function (x,o) {
+                            // Process the JSON data returned from the server
+                            try {
+                                data = Y.JSON.parse(o.responseText);
+            // set up module list dialog
 			$('#module-list').dialog({
 				modal: true,
 				autoOpen: false,
@@ -211,7 +226,27 @@
 
 		$("#tabs").tabs();
 
+                            }
+                            catch (e) {
+                                return;
+                            }
+
+                            Y.log("PARSED DATA: " + Y.Lang.dump(data));
+                            if (data.error) {
+                                data=[];
+                            }
+                        },
+
+                        failure : function (x,o) {
+                                data='';
+                        }
+                    }
+                }
+                Y.io(M.cfg.wwwroot+"/report/modulereport/ajax.php", callback);
+            });
 	});
+
 	</script>
 </body>
 </html>
+<?php    echo $OUTPUT->footer();
