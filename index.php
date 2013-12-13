@@ -6,21 +6,24 @@
 	require_login();
 	
 	$heading = get_string('modulereport', 'report_modulereport');
+    $PAGE->set_url('/report/modulereport/index.php');
+    $PAGE->set_pagelayout('datool');
+
+    /**
+     * jQuery
+     */
+    $PAGE->requires->jquery();
+    $PAGE->requires->jquery_plugin('ui');
+  //  $PAGE->requires->yui();
+
+    /**
+     * Our CSS
+     */
+    $PAGE->requires->css('/report/modulereport/styles/jquery-ui-1.8.14.custom.css');
+    $PAGE->requires->css('/report/modulereport/styles/styles.css');
+
     echo $OUTPUT->header();
 ?>
-<!doctype html>
-<html lang="en">
-	<head>
-		<link rel="stylesheet" href="styles/styles.css" />
-		<link rel="stylesheet" href="styles/jquery-ui-1.8.14.custom.css" />
-
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  		<script>window.jQuery || document.write("<script src='js/jquery.min.js'>\x3C/script>")</script>
-  
-		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"></script>
-  		<script>window.jQuery || document.write("<script src='js/jquery-ui.min.js'>\x3C/script>")</script>
-	</head>
-	<body>
 
 		<h1 class="main_title">Moodle module usage report</h1>
 	
@@ -73,9 +76,9 @@
 		    return formatted;
 		};
 
-		var moodleCourseUrl = 'http://moodle.kent.ac.uk/archive/course/view.php?id={0}';
-		var moodleSchoolUrl = 'http://moodle.kent.ac.uk/archive/course/category.php?id={0}';
-		var moodleModuleUrl = 'http://moodle.kent.ac.uk/archive/';
+		var moodleCourseUrl = M.cfg.wwwroot+'/course/view.php?id={0}';
+		var moodleSchoolUrl = M.cfg.wwwroot+'/course/category.php?id={0}';
+		var moodleModuleUrl = M.cfg.wwwroot;
 
 		var moduleList = [];
 		for (moduleName in data[0].moduleCount) {
@@ -247,6 +250,4 @@
 	});
 
 	</script>
-</body>
-</html>
-<?php    echo $OUTPUT->footer();
+<?php   echo $OUTPUT->footer();

@@ -58,6 +58,7 @@ ON cc.depth<=cc2.depth and cc2.path like CONCAT (cc.path,'%')
 LEFT OUTER JOIN mdl_course c
 ON c.category = cc2.id
 where cc.depth=1 
+and cc.id <>1
 group by cc.id;
 SQLDATA;
 
@@ -66,6 +67,8 @@ SQLDATA;
         $array=array();
         foreach ($data as $key=>$value) {
             $value->children =  $this->get_children_node($value->id); 
+            $value->moduleCount =  $this->get_modules_node($value->id); 
+            $value->courses =  $this->get_courses_node($value->id); 
             array_push($array,$value);
         }
         return $array;
