@@ -133,7 +133,6 @@ SQLDATA;
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
 
-//var_dump(array('sql'=>$sql,'params'=>$params,'data'=>$data,'tag'=>'1'));
         $array=array();
         foreach ($data as $key=>$value) {
             $value->moduleCount =  $this->get_modules_node($value->id); 
@@ -170,7 +169,6 @@ SQLDATA;
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
 
-//var_dump(array('sql'=>$sql,'params'=>$params,'data'=>$data,'tag'=>'2'));
         $array=array();
         foreach ($data as $key=>$value) {
             $array = array_merge($array,array($value->name=>$value->cnt));
@@ -199,7 +197,6 @@ SQLDATA;
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
 
-//var_dump(array('sql'=>$sql,'params'=>$params,'data'=>$data,'tag'=>'2'));
         $array=array();
         foreach ($data as $key=>$value) {
             $array = array_merge($array,array($value->name=>$value->cnt));
