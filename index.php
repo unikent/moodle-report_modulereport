@@ -2,6 +2,10 @@
 	require_once('../../config.php');
 	require_once($CFG->libdir.'/adminlib.php');
 	require_once($CFG->libdir.'/filelib.php');
+
+	global $PAGE;
+
+	$PAGE->set_context(context_system::instance());
 	
 	require_login();
 	
