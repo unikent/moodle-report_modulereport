@@ -1,250 +1,252 @@
 <?php 
-	require_once('../../config.php');
-	require_once($CFG->libdir.'/adminlib.php');
-	require_once($CFG->libdir.'/filelib.php');
+require_once('../../config.php');
+require_once($CFG->libdir.'/adminlib.php');
+require_once($CFG->libdir.'/filelib.php');
 
-	global $PAGE;
+global $PAGE, $OUTPUT;
 
-	$PAGE->set_context(context_system::instance());
-	
-	require_login();
-	
-	$heading = get_string('modulereport', 'report_modulereport');
-    $PAGE->set_url('/report/modulereport/index.php');
-    $PAGE->set_pagelayout('datool');
+$PAGE->set_context(context_system::instance());
 
-    /**
-     * jQuery
-     */
-    $PAGE->requires->jquery();
-    $PAGE->requires->jquery_plugin('ui');
-    $PAGE->requires->jquery_plugin('ui-css');
+require_login();
 
-    /**
-     * Our CSS
-     */
-    $PAGE->requires->css('/report/modulereport/styles/styles.css');
+$heading = get_string('modulereport', 'report_modulereport');
+$PAGE->set_url('/report/modulereport/index.php');
+$PAGE->set_pagelayout('datool');
 
-    echo $OUTPUT->header();
+/**
+ * jQuery
+ */
+$PAGE->requires->jquery();
+$PAGE->requires->jquery_plugin('ui');
+$PAGE->requires->jquery_plugin('ui-css');
+
+/**
+ * Our CSS
+ */
+$PAGE->requires->css('/report/modulereport/styles/styles.css');
+
+echo $OUTPUT->header();
 ?>
 
-		<h1 class="main_title">Moodle module usage report</h1>
+<h1 class="main_title">Moodle module usage report</h1>
+
+<div id='module-list' title='Module list'>
 	
-		<div id='module-list' title='Module list'>
-			
-		</div>
-	
-		<div id="tabs">
-			<ul id='faculty-list'>
-				<!--<li><a href="#tabs-1">Faculty of Science. Technology and Medical Studies</a></li>
-				<li><a href="#tabs-2">Faculty of Humanities</a></li>
-				<li><a href="#tabs-3">Faculty of Scocial Sciences</a></li>-->
-			</ul>
-		</div>
+</div>
 
-	<script type="text/javascript">
-		$(function () {
+<div id="tabs">
+	<ul id='faculty-list'>
+		<!--<li><a href="#tabs-1">Faculty of Science. Technology and Medical Studies</a></li>
+		<li><a href="#tabs-2">Faculty of Humanities</a></li>
+		<li><a href="#tabs-3">Faculty of Scocial Sciences</a></li>-->
+	</ul>
+</div>
 
-		    var data = [];
+<script type="text/javascript">
+	$(function () {
 
-		    YUI().use("node", "io", "dump", "json-parse", function (Y) {
-		        var callback = {
+	    var data = [];
 
-		            timeout: 3000,
-		            method: "GET",
-		            data: {
-		                sesskey: M.cfg.sesskey
-		            },
+	    YUI().use("node", "io", "dump", "json-parse", function (Y) {
+	        var callback = {
 
-		            on: {
-		                success: function (x, o) {
-		                    // Process the JSON data returned from the server
-		                    try {
-		                        data = Y.JSON.parse(o.responseText);
-		                        // set up module list dialog
-		                        $('#module-list').dialog({
-		                            modal: true,
-		                            autoOpen: false,
-		                            width: 350,
-		                            height: 400,
-		                            resizable: false,
-		                            draggable: false
-		                        });
+	            timeout: 3000,
+	            method: "GET",
+	            data: {
+	                sesskey: M.cfg.sesskey
+	            },
 
-		                        String.prototype.format = function () {
-		                            var formatted = this;
-		                            for (arg in arguments) {
-		                                formatted = formatted.replace("{" + arg + "}", arguments[arg]);
-		                            }
-		                            return formatted;
-		                        };
+	            on: {
+	                success: function (x, o) {
+	                    // Process the JSON data returned from the server
+	                    try {
+	                        data = Y.JSON.parse(o.responseText);
+	                        // set up module list dialog
+	                        $('#module-list').dialog({
+	                            modal: true,
+	                            autoOpen: false,
+	                            width: 350,
+	                            height: 400,
+	                            resizable: false,
+	                            draggable: false
+	                        });
 
-		                        var moodleCourseUrl = M.cfg.wwwroot + '/course/view.php?id={0}';
-		                        var moodleSchoolUrl = M.cfg.wwwroot + '/course/category.php?id={0}';
-		                        var moodleModuleUrl = M.cfg.wwwroot;
+	                        String.prototype.format = function () {
+	                            var formatted = this;
+	                            for (arg in arguments) {
+	                                formatted = formatted.replace("{" + arg + "}", arguments[arg]);
+	                            }
+	                            return formatted;
+	                        };
 
-		                        var moduleList = [];
-		                        for (moduleName in data[0].moduleCount) {
-		                            moduleList.push(moduleName);
-		                        }
-		                        moduleList.sort();
+	                        var moodleCourseUrl = M.cfg.wwwroot + '/course/view.php?id={0}';
+	                        var moodleSchoolUrl = M.cfg.wwwroot + '/course/category.php?id={0}';
+	                        var moodleModuleUrl = M.cfg.wwwroot;
 
-		                        var iterateSchools = function (schools, container, nesting) {
+	                        var moduleList = [];
+	                        for (moduleName in data[0].moduleCount) {
+	                            moduleList.push(moduleName);
+	                        }
+	                        moduleList.sort();
 
-		                            $.each(schools, function (index, school) {
+	                        var iterateSchools = function (schools, container, nesting) {
 
-		                                var indicator = '';
-		                                for (var i = 0; i < nesting; i++) indicator += '&raquo; ';
-		                                var name = indicator + "<a href='" + moodleSchoolUrl.format(school.id) + "'>" + school.name + "</a>";
+	                            $.each(schools, function (index, school) {
 
-		                                var dataset = $("<ul class='data-set'><li class='cat'>" + name + "</li></ul>").appendTo(container);
+	                                var indicator = '';
+	                                for (var i = 0; i < nesting; i++) indicator += '&raquo; ';
+	                                var name = indicator + "<a href='" + moodleSchoolUrl.format(school.id) + "'>" + school.name + "</a>";
 
-		                                // iterate the module list and display this school's count for
-		                                // each module
-		                                $.each(moduleList, function (i, moduleName) {
+	                                var dataset = $("<ul class='data-set'><li class='cat'>" + name + "</li></ul>").appendTo(container);
 
-		                                    var moduleCount = school.moduleCount[moduleName];
+	                                // iterate the module list and display this school's count for
+	                                // each module
+	                                $.each(moduleList, function (i, moduleName) {
 
-		                                    if (moduleCount > 0) {
+	                                    var moduleCount = school.moduleCount[moduleName];
 
-		                                        var cell = $("<li class='data'>" + moduleCount + "</li>").appendTo(dataset);
+	                                    if (moduleCount > 0) {
 
-		                                        cell.addClass('active');
+	                                        var cell = $("<li class='data'>" + moduleCount + "</li>").appendTo(dataset);
 
-		                                        if (school.courses.length > 0) {
+	                                        cell.addClass('active');
 
-		                                            //var offset = cell.offset();
+	                                        if (school.courses.length > 0) {
 
-		                                            // create a pop up box to show the list of courses using this module
-		                                            //var courseBox = $("<div class='courseBoxWrapper'><div class='courseBox'><div class='arrow'></div><div class='innerArrow'></div><div class='inner'><table></table></div></div></div>")
-		                                            //	.css('top', offset.top-33).css('left', offset.left-34).hide();
+	                                            //var offset = cell.offset();
 
-		                                            var dialogContent = $("<div class='courseBoxWrapper'><table></table></div>");
+	                                            // create a pop up box to show the list of courses using this module
+	                                            //var courseBox = $("<div class='courseBoxWrapper'><div class='courseBox'><div class='arrow'></div><div class='innerArrow'></div><div class='inner'><table></table></div></div></div>")
+	                                            //	.css('top', offset.top-33).css('left', offset.left-34).hide();
 
-		                                            $.each(school.courses, function (i, course) {
+	                                            var dialogContent = $("<div class='courseBoxWrapper'><table></table></div>");
 
-		                                                // we only want to stick this course in this box if it's actually used
-		                                                // this module, so...
-		                                                var useCourse = false;
+	                                            $.each(school.courses, function (i, course) {
 
-		                                                $.each(course.moduleCount, function (_moduleName, _count) {
+	                                                // we only want to stick this course in this box if it's actually used
+	                                                // this module, so...
+	                                                var useCourse = false;
 
-		                                                    if (!useCourse && _moduleName == moduleName && _count > 0) {
-		                                                        useCourse = true;
-		                                                        //console.log(course.name);console.log(_moduleName);console.log(_count);
-		                                                    }
-		                                                });
+	                                                $.each(course.moduleCount, function (_moduleName, _count) {
 
-		                                                if (useCourse) {
+	                                                    if (!useCourse && _moduleName == moduleName && _count > 0) {
+	                                                        useCourse = true;
+	                                                        //console.log(course.name);console.log(_moduleName);console.log(_count);
+	                                                    }
+	                                                });
 
-		                                                    $('table', dialogContent).append("<tr><td class='name'><a href='" + moodleCourseUrl.format(course.id) + "'>" + course.name + "</a></td><td class='count'>" + course.moduleCount[moduleName] + "</td></tr>");
+	                                                if (useCourse) {
 
-		                                                }
-		                                            });
+	                                                    $('table', dialogContent).append("<tr><td class='name'><a href='" + moodleCourseUrl.format(course.id) + "'>" + course.name + "</a></td><td class='count'>" + course.moduleCount[moduleName] + "</td></tr>");
 
-		                                            //courseBox.appendTo($('body'));
-		                                            // replace content of the module-list dialog with new content
-		                                            //$('#module-list').html(dialogContent);
+	                                                }
+	                                            });
 
-		                                            // add onclick event so when this module count is clicked, the list of
-		                                            // courses using this module is displayed
-		                                            cell.click(function () {
+	                                            //courseBox.appendTo($('body'));
+	                                            // replace content of the module-list dialog with new content
+	                                            //$('#module-list').html(dialogContent);
 
-		                                                var moduleList = $('#module-list');
+	                                            // add onclick event so when this module count is clicked, the list of
+	                                            // courses using this module is displayed
+	                                            cell.click(function () {
 
-		                                                if (moduleList.dialog('isOpen')) {
-		                                                    moduleList.dialog('close');
-		                                                }
+	                                                var moduleList = $('#module-list');
 
-		                                                moduleList.html(dialogContent);
-		                                                moduleList.dialog('open');
+	                                                if (moduleList.dialog('isOpen')) {
+	                                                    moduleList.dialog('close');
+	                                                }
 
-		                                                // hide all other course boxes
-		                                                /*if (courseBox.css('display') == 'none') {
-															// hide other boxes and display this one
-															$('.courseBoxWrapper').stop().fadeOut(100);
-															courseBox.stop().fadeIn(350);
-														}
-														else {
-															courseBox.stop().fadeOut(100);
-														}*/
-		                                            });
-		                                        }
+	                                                moduleList.html(dialogContent);
+	                                                moduleList.dialog('open');
 
-		                                    } else {
-		                                        var cell = $("<li class = 'data empty'></li>").appendTo(dataset);
-		                                    }
+	                                                // hide all other course boxes
+	                                                /*if (courseBox.css('display') == 'none') {
+														// hide other boxes and display this one
+														$('.courseBoxWrapper').stop().fadeOut(100);
+														courseBox.stop().fadeIn(350);
+													}
+													else {
+														courseBox.stop().fadeOut(100);
+													}*/
+	                                            });
+	                                        }
 
-		                                });
+	                                    } else {
+	                                        var cell = $("<li class = 'data empty'></li>").appendTo(dataset);
+	                                    }
 
-		                                if (school.children) {
-		                                    // has children, so iterate those too
-		                                    //console.log('iterating children of [' + school.name + ']');
-		                                    iterateSchools(school.children, container, nesting + 1);
-		                                }
-		                            });
-		                        }
+	                                });
 
-		                        var facultyCounter = 1;
+	                                if (school.children) {
+	                                    // has children, so iterate those too
+	                                    //console.log('iterating children of [' + school.name + ']');
+	                                    iterateSchools(school.children, container, nesting + 1);
+	                                }
+	                            });
+	                        }
 
-		                        $.each(data, function (index, faculty) {
+	                        var facultyCounter = 1;
 
-		                            var name = faculty.name;
+	                        $.each(data, function (index, faculty) {
 
-		                            if (name.toLowerCase().indexOf('faculty of science') != -1 || name.toLowerCase().indexOf('faculty of humanities') != -1 || name.toLowerCase().indexOf('faculty of social') != -1) {
+	                            var name = faculty.name;
 
-		                                // create the tab bar li item
-		                                var ul = $('#faculty-list');
-		                                $("<li><a href='#tabs-" + facultyCounter + "'>" + faculty.name + "</a></li>").appendTo(ul);
+	                            if (name.toLowerCase().indexOf('faculty of science') != -1 || name.toLowerCase().indexOf('faculty of humanities') != -1 || name.toLowerCase().indexOf('faculty of social') != -1) {
 
-		                                // create the tab container for this faculty
-		                                var tabs = $('#tabs');
+	                                // create the tab bar li item
+	                                var ul = $('#faculty-list');
+	                                $("<li><a href='#tabs-" + facultyCounter + "'>" + faculty.name + "</a></li>").appendTo(ul);
 
-		                                var tabContainer = $("<div id='tabs-" + facultyCounter + "'></div>").appendTo(tabs);
-		                                var dataTable = $("<ul class='data-table'></ul>").appendTo(tabContainer);
+	                                // create the tab container for this faculty
+	                                var tabs = $('#tabs');
 
-		                                // create table headings
+	                                var tabContainer = $("<div id='tabs-" + facultyCounter + "'></div>").appendTo(tabs);
+	                                var dataTable = $("<ul class='data-table'></ul>").appendTo(tabContainer);
 
-		                                var labelTable = $("<ul class='labels'></ul>").appendTo(dataTable);
-		                                $('<li class="cat">Categories</li>').appendTo(labelTable);
+	                                // create table headings
 
-		                                $.each(moduleList, function (index, moduleName) {
+	                                var labelTable = $("<ul class='labels'></ul>").appendTo(dataTable);
+	                                $('<li class="cat">Categories</li>').appendTo(labelTable);
 
-		                                    var dataLabels = $("<li>" + moduleName + "</li>").appendTo(labelTable);
-		                                });
+	                                $.each(moduleList, function (index, moduleName) {
 
-		                                //$('<div class="clear"></div>').appendTo(dataTable);
+	                                    var dataLabels = $("<li>" + moduleName + "</li>").appendTo(labelTable);
+	                                });
 
-		                                // now start iterating the schools within this faculty 
-		                                if (faculty.children) {
-		                                    //console.log('iterating schools for ' + name);
-		                                    iterateSchools(faculty.children, dataTable, 0);
-		                                }
+	                                //$('<div class="clear"></div>').appendTo(dataTable);
 
-		                                facultyCounter++;
-		                            }
+	                                // now start iterating the schools within this faculty 
+	                                if (faculty.children) {
+	                                    //console.log('iterating schools for ' + name);
+	                                    iterateSchools(faculty.children, dataTable, 0);
+	                                }
+
+	                                facultyCounter++;
+	                            }
 
 
-		                        });
+	                        });
 
-		                        $("#tabs").tabs();
+	                        $("#tabs").tabs();
 
-		                    } catch (e) {
-		                        return;
-		                    }
+	                    } catch (e) {
+	                        return;
+	                    }
 
-		                    if (data.error) {
-		                        data = [];
-		                    }
-		                },
+	                    if (data.error) {
+	                        data = [];
+	                    }
+	                },
 
-		                failure: function (x, o) {
-		                    data = '';
-		                }
-		            }
-		        }
-		        Y.io(M.cfg.wwwroot + "/report/modulereport/ajax.php", callback);
-		    });
-		});
-	</script>
-<?php   echo $OUTPUT->footer();
+	                failure: function (x, o) {
+	                    data = '';
+	                }
+	            }
+	        }
+	        Y.io(M.cfg.wwwroot + "/report/modulereport/ajax.php", callback);
+	    });
+	});
+</script>
+
+<?php
+echo $OUTPUT->footer();
