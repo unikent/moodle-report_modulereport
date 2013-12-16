@@ -11,4 +11,4 @@ require_once(dirname(__FILE__) . '/ajaxlib.php');
 $ajax = new modulereport_ajax();
 $content = $ajax->get_content();
 
-echo json_encode($content->data);
+echo json_encode($content->data, JSON_NUMERIC_CHECK);

@@ -51,12 +51,14 @@ class modulereport_ajax {
         global $DB;
         
         $sql = <<< SQLDATA
-SELECT cc.id,cc.name, count(DISTINCT c.id) totalModuleCount 
+SELECT cc.id,cc.name, count(cm.id) totalModuleCount 
 FROM mdl_course_categories cc
 LEFT OUTER JOIN mdl_course_categories cc2
-ON cc.depth<=cc2.depth and cc2.path like CONCAT (cc.path,'%')
+ON cc.depth<=cc2.depth and CONCAT(cc2.path,'/') like CONCAT (cc.path,'/%')
 LEFT OUTER JOIN mdl_course c
 ON c.category = cc2.id
+LEFT OUTER JOIN mdl_course_modules cm
+ON cm.course=c.id
 where cc.depth=1 
 and cc.id <>1
 group by cc.id;
@@ -66,8 +68,10 @@ SQLDATA;
         $data = $DB->get_records_sql($sql,$params);
         $array=array();
         foreach ($data as $key=>$value) {
-            $value->children =  $this->get_children_node($value->id); 
             $value->moduleCount =  $this->get_modules_node($value->id); 
+            $value->totalModuleCount =  $value->totalmodulecount; 
+            unset($value->totalmodulecount); 
+            $value->children =  $this->get_children_node($value->id); 
             $value->courses =  $this->get_courses_node($value->id); 
             array_push($array,$value);
         }
@@ -78,14 +82,16 @@ SQLDATA;
         global $DB;
         
         $sql = <<< SQLDATA
-SELECT cc2.id,cc2.name, count(DISTINCT c.id) totalModuleCount 
+SELECT cc2.id,cc2.name, count(cm.id) totalModuleCount 
 FROM mdl_course_categories cc
 JOIN mdl_course_categories cc2
-ON cc.depth=cc2.depth-1 and cc2.path like CONCAT (cc.path,'/%')
+ON cc.depth=cc2.depth-1 and CONCAT(cc2.path,'/') like CONCAT (cc.path,'/%')
 LEFT OUTER JOIN mdl_course_categories cc3
 ON cc2.depth<=cc3.depth and cc3.path like CONCAT (cc2.path,'%')
 LEFT OUTER JOIN mdl_course c
 ON c.category = cc3.id
+LEFT OUTER JOIN mdl_course_modules cm
+ON cm.course=c.id
 where cc.id=:id
 group by cc2.id;
 SQLDATA;
@@ -95,8 +101,10 @@ SQLDATA;
 
         $array=array();
         foreach ($data as $key=>$value) {
-            $value->children =  $this->get_children_node($value->id); 
             $value->moduleCount =  $this->get_modules_node($value->id); 
+            $value->totalModuleCount =  $value->totalmodulecount; 
+            unset($value->totalmodulecount); 
+            $value->children =  $this->get_children_node($value->id); 
             $value->courses =  $this->get_courses_node($value->id); 
             array_push($array,$value);
         }
@@ -109,7 +117,7 @@ SQLDATA;
         global $DB;
         
         $sql = <<< SQLDATA
-SELECT c.id, c.shortname name, count(DISTINCT m.id) totalModuleCount 
+SELECT c.id, c.shortname name, count(cm.id) totalModuleCount 
 FROM  mdl_course c
 JOIN mdl_course_modules cm
 ON cm.course=c.id
@@ -128,6 +136,9 @@ SQLDATA;
 //var_dump(array('sql'=>$sql,'params'=>$params,'data'=>$data,'tag'=>'1'));
         $array=array();
         foreach ($data as $key=>$value) {
+            $value->moduleCount =  $this->get_modules_node($value->id); 
+            $value->totalModuleCount =  $value->totalmodulecount; 
+            unset($value->totalmodulecount); 
             array_push($array,$value);
         }
         return $array;
@@ -138,18 +149,50 @@ SQLDATA;
         global $DB;
         
         $sql = <<< SQLDATA
-SELECT m.name, count(DISTINCT c.id) cnt , count(*) cnt2 
+SELECT m.name, count(cm2.id) cnt
 FROM mdl_modules m
-LEFT OUTER JOIN mdl_course_modules cm
-ON cm.module = m.id
-LEFT OUTER JOIN mdl_course c
+LEFT OUTER JOIN (
+SELECT cm.id, cm.module
+FROM mdl_course_modules cm
+JOIN mdl_course c
 ON cm.course=c.id
-LEFT OUTER JOIN mdl_course_categories cc2
+JOIN mdl_course_categories cc2
 ON c.category = cc2.id
-LEFT OUTER JOIN mdl_course_categories cc
-ON cc.depth<=cc2.depth and cc2.path like CONCAT (cc.path,'%')
-AND cc.id=:id
-group by m.id
+JOIN mdl_course_categories cc
+ON cc.depth<=cc2.depth and CONCAT(cc2.path,'/') like CONCAT (cc.path,'/%')
+AND cc.id=:id) cm2
+ON cm2.module = m.id
+WHERE exists (select 1 FROM mdl_course_modules WHERE module = m.id)
+group by m.name
+ORDER BY m.name
+SQLDATA;
+
+        $params = array('id' => $id);
+        $data = $DB->get_records_sql($sql, $params);
+
+//var_dump(array('sql'=>$sql,'params'=>$params,'data'=>$data,'tag'=>'2'));
+        $array=array();
+        foreach ($data as $key=>$value) {
+            $array = array_merge($array,array($value->name=>$value->cnt));
+        }
+        return $array;
+    }
+
+    private function get_course_node($id) {
+        global $DB;
+        
+        $sql = <<< SQLDATA
+SELECT m.name, count(cm2.id) cnt 
+FROM mdl_modules m
+LEFT OUTER JOIN (
+SELECT cm.id, cm.module
+FROM mdl_course_modules cm
+JOIN mdl_course c
+ON cm.course=c.id
+AND c.id=:id) cm2
+ON cm2.module = m.id
+WHERE exists (select 1 FROM mdl_course_modules WHERE module = m.id)
+group by m.name
 ORDER BY m.name;
 SQLDATA;
 
@@ -159,8 +202,9 @@ SQLDATA;
 //var_dump(array('sql'=>$sql,'params'=>$params,'data'=>$data,'tag'=>'2'));
         $array=array();
         foreach ($data as $key=>$value) {
-            array_push($array,array($value->name=>$value->cnt));
+            $array = array_merge($array,array($value->name=>$value->cnt));
         }
         return $array;
     }
+
 }
