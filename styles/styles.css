@@ -20,10 +20,10 @@ body {
 	width: 1090px;
 	background-color: #474747;
 	color: #fff;
-	margin: 0px 0px 10px 0px;
+	margin: 0px 0px 2px 0px;
 	font-family: verdana,helvetica,arial,sans-serif;
 	font-weight: normal;
-	padding: 5px 0px 5px 10px;
+	padding: 5px 0px 5px 0px;
 }
 
 /* Tab styles */
@@ -40,8 +40,8 @@ body {
 		#tabs .ui-state-default, #tabs .ui-widget-content .ui-state-default, #tabs .ui-widget-header .ui-state-default  {
 			border: none;
 			background: none;
-		}
-		
+        }
+        
 		#tabs .ui-state-default a:hover {
 			color: #eee;
 		}
@@ -57,7 +57,7 @@ body {
 		
 			#tabs .ui-widget-header .ui-state-active a {color: #474747;}
 		
-	#tabs .ui-widget-content { background-image: none; background-color: #eee; font-size: 12px;}
+	#tabs .ui-widget-content { background-image: none; background-color: #eee; font-size: 12px; }
 	
 /* List styles */
 	.data-table {
@@ -223,6 +223,17 @@ body {
 						height: 16px;
 						float: left;
 					}
+		#tabs .ui-widget-content {
+            padding:2px 4px 2px 4px;
+		}
+
+		ul.data-set {
+            margin:2px 4px 2px 4px;
+		}
+
+        ul.labels {
+            margin:2px 4px 2px 4px;
+		}
 
 /* Utility classes */
 .clear {clear: both;}
