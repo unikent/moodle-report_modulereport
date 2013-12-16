@@ -7,11 +7,10 @@ global $PAGE, $OUTPUT;
 
 $PAGE->set_context(context_system::instance());
 
-require_login();
-
-$heading = get_string('modulereport', 'report_modulereport');
 $PAGE->set_url('/report/modulereport/index.php');
 $PAGE->set_pagelayout('datool');
+
+require_login();
 
 /**
  * jQuery
