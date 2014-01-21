@@ -46,6 +46,9 @@ echo $OUTPUT->header();
 
 	    var data = [];
 
+		var spinner = M.util.add_spinner(Y, Y.one('#faculty-list'));
+		spinner.show();
+
 	    YUI().use("node", "io", "dump", "json-parse", function (Y) {
 	        var callback = {
 
@@ -57,6 +60,7 @@ echo $OUTPUT->header();
 
 	            on: {
 	                success: function (x, o) {
+	                	spinner.hide();
 	                    // Process the JSON data returned from the server
 	                    try {
 	                        data = Y.JSON.parse(o.responseText);
@@ -130,7 +134,7 @@ echo $OUTPUT->header();
 
 	                                                    if (!useCourse && _moduleName == moduleName && _count > 0) {
 	                                                        useCourse = true;
-	                                                        //console.log(course.name);console.log(_moduleName);console.log(_count);
+	                                                        console.log(course.name);console.log(_moduleName);console.log(_count);
 	                                                    }
 	                                                });
 
