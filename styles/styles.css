@@ -74,55 +74,41 @@ body {
 			overflow: auto;
 		}
 	
-		.labels li { 
-			float: left;
-			list-style: none;
-			width: 75px;
+		.labels td { 
 			background: #bdbdbd;
 			font-size: 14px;
-			padding: 3px 0px 3px 4px;
+			padding: 6px;
 			border: 1px solid #fff;
 		}
-		.data-set li {
-			float: left; 
-			list-style: none; 
-			width: 75px; 
+
+		.data-set td {
 			padding:2px 0px 2px 4px; 
 			background-color: #e3e3e3; 
 			border: 1px solid #fff;
-			min-height: 14px;
 		}
 		
 			.data-table .cat {
 				width: 150px;
 			}
 			
-			.data-set li.data {
+			.data-set td.data {
 				text-align: center; position: relative;
 			}
-				.data-set li.data .info {
-					
-				}
 			
-				.data-set li.active {
+				.data-set td.active {
 					background: #ccc;
 					cursor: pointer;
 				}
-					.data-set li.active:hover {
+					.data-set td.active:hover {
 						background: #999;
 						color: #fff;
 					}
-				.data-set li.active .arrow { 
-					width: 30px;
-					height: 18px;
-					background: url("images/arrow.png") no-repeat;
-					position: absolute;
-					bottom: -16px;
-					left: 25px;
+				.data-set td.active .arrow { 
+					background: url("images/arrow.png") no-repeat center center;
 				}
 				
-				.data-set li.empty {
-					background:transparent url('images/emptyIcon.png') no-repeat 35px 5px; 
+				.data-set td.empty {
+					background:transparent url('images/emptyIcon.png') no-repeat center center; 
 				}
 		
 		#module-list {
@@ -223,6 +209,7 @@ body {
 						float: left;
 					}
 		#tabs .ui-widget-content {
+			overflow-x: scroll;
             padding:2px 4px 2px 4px;
 		}
 

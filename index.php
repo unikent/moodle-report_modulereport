@@ -96,7 +96,7 @@ echo $OUTPUT->header();
 	                                for (var i = 0; i < nesting; i++) indicator += '&raquo; ';
 	                                var name = indicator + "<a href='" + moodleSchoolUrl.format(school.id) + "'>" + school.name + "</a>";
 
-	                                var dataset = $("<ul class='data-set'><li class='cat'>" + name + "</li></ul>").appendTo(container);
+	                                var dataset = $("<tr class='data-set'><td class='cat'>" + name + "</td></tr>").appendTo(container);
 
 	                                // iterate the module list and display this school's count for
 	                                // each module
@@ -106,7 +106,7 @@ echo $OUTPUT->header();
 
 	                                    if (moduleCount > 0) {
 
-	                                        var cell = $("<li class='data'>" + moduleCount + "</li>").appendTo(dataset);
+	                                        var cell = $("<td class='data'>" + moduleCount + "</td>").appendTo(dataset);
 
 	                                        cell.addClass('active');
 
@@ -171,7 +171,7 @@ echo $OUTPUT->header();
 	                                        }
 
 	                                    } else {
-	                                        var cell = $("<li class = 'data empty'></li>").appendTo(dataset);
+	                                        var cell = $("<td class = 'data empty'></td>").appendTo(dataset);
 	                                    }
 
 	                                });
@@ -200,16 +200,16 @@ echo $OUTPUT->header();
 	                                var tabs = $('#tabs');
 
 	                                var tabContainer = $("<div id='tabs-" + facultyCounter + "'></div>").appendTo(tabs);
-	                                var dataTable = $("<ul class='data-table'></ul>").appendTo(tabContainer);
+	                                var dataTable = $("<table class='data-table'></table>").appendTo(tabContainer);
 
 	                                // create table headings
 
-	                                var labelTable = $("<ul class='labels'></ul>").appendTo(dataTable);
-	                                $('<li class="cat">Categories</li>').appendTo(labelTable);
+	                                var labelTable = $("<thead class='labels'><tr></tr></thead>").appendTo(dataTable);
+	                                $('<td class="cat">Categories</td>').appendTo(labelTable);
 
 	                                $.each(moduleList, function (index, moduleName) {
 
-	                                    var dataLabels = $("<li>" + moduleName + "</li>").appendTo(labelTable);
+	                                    var dataLabels = $("<td>" + moduleName + "</td>").appendTo(labelTable);
 	                                });
 
 	                                //$('<div class="clear"></div>').appendTo(dataTable);
