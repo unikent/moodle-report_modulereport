@@ -82,17 +82,19 @@ body {
 		}
 
 		.data-set td {
-			padding:2px 0px 2px 4px; 
+			padding:4px 0px 4px 4px; 
 			background-color: #e3e3e3; 
 			border: 1px solid #fff;
 		}
 		
 			.data-table .cat {
-				width: 150px;
+				min-width: 300px;
 			}
 			
 			.data-set td.data {
 				text-align: center; position: relative;
+				min-width: 60px;
+				max-width: 60px;
 			}
 			
 				.data-set td.active {
