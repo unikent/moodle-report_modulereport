@@ -49,7 +49,7 @@ echo $OUTPUT->header();
 	    YUI().use("node", "io", "dump", "json-parse", function (Y) {
 	        var callback = {
 
-	            timeout: 3000,
+	            timeout: 120000,
 	            method: "GET",
 	            data: {
 	                sesskey: M.cfg.sesskey
