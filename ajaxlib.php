@@ -61,6 +61,7 @@ class modulereport_ajax {
                 ON cm.course = c.id
             WHERE cc.depth = 1 
                 AND cc.id <>1
+                AND cc.name <> "Removed"
             GROUP BY cc.id;
 SQL;
 
