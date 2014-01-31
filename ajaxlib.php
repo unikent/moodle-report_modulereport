@@ -42,7 +42,7 @@ class modulereport_ajax {
         $content = new stdClass();
         $content->data = array();
 
-        $content->data=$this->get_root_node();
+        $content->data = $this->get_root_node();
 
         return $content;
     }
@@ -163,7 +163,7 @@ SQL;
                     JOIN {course_categories} cc
                         ON cc.depth <= cc2.depth
                         AND CONCAT(cc2.path,'/') LIKE CONCAT (cc.path,'/%')
-                        AND cc.id=:id
+                        AND cc.id = :id
                     GROUP BY c.id, cm.module
                 ) cm2
                     ON cm2.module = m.id
@@ -195,8 +195,8 @@ SQL;
                 SELECT cm.id, cm.module
                     FROM {course_modules} cm
                     JOIN {course} c
-                        ON cm.course=c.id
-                        AND c.id=:id
+                        ON cm.course = c.id
+                        AND c.id = :id
             ) cm2
                 ON cm2.module = m.id
             WHERE exists (SELECT 1 FROM {course_modules} WHERE module = m.id)
