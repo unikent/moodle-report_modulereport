@@ -50,7 +50,7 @@ class modulereport_ajax {
     private function get_root_node() {
         global $DB;
         
-        $sql = <<< SQLDATA
+        $sql = <<< SQL
 SELECT cc.id,cc.name, count(cm.id) totalModuleCount 
 FROM mdl_course_categories cc
 LEFT OUTER JOIN mdl_course_categories cc2
@@ -62,7 +62,7 @@ ON cm.course=c.id
 where cc.depth=1 
 and cc.id <>1
 group by cc.id;
-SQLDATA;
+SQL;
 
         $params = array();
         $data = $DB->get_records_sql($sql,$params);
@@ -81,7 +81,7 @@ SQLDATA;
     private function get_children_node($id) {
         global $DB;
         
-        $sql = <<< SQLDATA
+        $sql = <<< SQL
 SELECT cc2.id,cc2.name, count(cm.id) totalModuleCount 
 FROM mdl_course_categories cc
 JOIN mdl_course_categories cc2
@@ -94,7 +94,7 @@ LEFT OUTER JOIN mdl_course_modules cm
 ON cm.course=c.id
 where cc.id=:id
 group by cc2.id;
-SQLDATA;
+SQL;
 
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
@@ -116,7 +116,7 @@ SQLDATA;
     private function get_courses_node($id) {
         global $DB;
         
-        $sql = <<< SQLDATA
+        $sql = <<< SQL
 SELECT c.id, c.shortname name, count(cm.id) totalModuleCount 
 FROM  mdl_course c
 JOIN mdl_course_modules cm
@@ -128,7 +128,7 @@ ON c.category = cc.id
 AND cc.id=:id
 group by c.id
 ORDER BY c.shortname;
-SQLDATA;
+SQL;
 
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
@@ -147,7 +147,7 @@ SQLDATA;
     private function get_modules_node($id) {
         global $DB;
         
-        $sql = <<< SQLDATA
+        $sql = <<< SQL
 SELECT m.name, count(cm2.id) cnt
 FROM mdl_modules m
 LEFT OUTER JOIN (
@@ -164,7 +164,7 @@ ON cm2.module = m.id
 WHERE exists (select 1 FROM mdl_course_modules WHERE module = m.id)
 group by m.name
 ORDER BY m.name
-SQLDATA;
+SQL;
 
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
@@ -179,7 +179,7 @@ SQLDATA;
     private function get_course_node($id) {
         global $DB;
         
-        $sql = <<< SQLDATA
+        $sql = <<< SQL
 SELECT m.name, count(cm2.id) cnt 
 FROM mdl_modules m
 LEFT OUTER JOIN (
@@ -192,7 +192,7 @@ ON cm2.module = m.id
 WHERE exists (select 1 FROM mdl_course_modules WHERE module = m.id)
 group by m.name
 ORDER BY m.name;
-SQLDATA;
+SQL;
 
         $params = array('id' => $id);
         $data = $DB->get_records_sql($sql, $params);
