@@ -182,18 +182,19 @@ SQL;
         global $DB;
         
         $sql = <<< SQL
-SELECT m.name, count(cm2.id) cnt 
-FROM {modules} m
-LEFT OUTER JOIN (
-SELECT cm.id, cm.module
-FROM {course_modules} cm
-JOIN {course} c
-ON cm.course=c.id
-AND c.id=:id) cm2
-ON cm2.module = m.id
-WHERE exists (select 1 FROM {course_modules} WHERE module = m.id)
-group by m.name
-ORDER BY m.name;
+            SELECT m.name, count(cm2.id) cnt 
+                FROM {modules} m
+            LEFT OUTER JOIN (
+                SELECT cm.id, cm.module
+                    FROM {course_modules} cm
+                    JOIN {course} c
+                        ON cm.course=c.id
+                        AND c.id=:id
+            ) cm2
+                ON cm2.module = m.id
+            WHERE exists (SELECT 1 FROM {course_modules} WHERE module = m.id)
+            GROUP BY m.name
+            ORDER BY m.name;
 SQL;
 
         $params = array('id' => $id);
