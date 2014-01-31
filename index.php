@@ -83,7 +83,7 @@ echo $OUTPUT->header();
 	                        };
 
 	                        var moodleCourseUrl = M.cfg.wwwroot + '/course/view.php?id={0}';
-	                        var moodleSchoolUrl = M.cfg.wwwroot + '/course/category.php?id={0}';
+	                        var moodleSchoolUrl = M.cfg.wwwroot + '/course/index.php?categoryid={0}';
 	                        var moodleModuleUrl = M.cfg.wwwroot;
 
 	                        var moduleList = [];
