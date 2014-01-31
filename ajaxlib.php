@@ -157,11 +157,12 @@ ON cm.course=c.id
 JOIN {course_categories} cc2
 ON c.category = cc2.id
 JOIN {course_categories} cc
-ON cc.depth<=cc2.depth and CONCAT(cc2.path,'/') like CONCAT (cc.path,'/%')
-AND cc.id=:id) cm2
+ON cc.depth<=cc2.depth AND CONCAT(cc2.path,'/') LIKE CONCAT (cc.path,'/%')
+AND cc.id=:id
+GROUP BY c.id, cm.module) cm2
 ON cm2.module = m.id
-WHERE exists (select 1 FROM {course_modules} WHERE module = m.id)
-group by m.name
+WHERE exists (SELECT 1 FROM {course_modules} WHERE module = m.id)
+GROUP BY m.name
 ORDER BY m.name
 SQL;
 
