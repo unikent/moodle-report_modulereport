@@ -47,7 +47,7 @@ class modulereport_ajax {
         return $content;
     }
 
-    private function get_root_node() {
+    public function get_root_node() {
         global $DB;
         
         $sql = <<< SQL
@@ -79,7 +79,7 @@ SQL;
         return $array;
     }
     
-    private function get_children_node($id) {
+    public function get_children_node($id) {
         global $DB;
         
         $sql = <<< SQL
@@ -115,7 +115,7 @@ SQL;
 
 }
     
-    private function get_courses_node($id) {
+    public function get_courses_node($id) {
         global $DB;
         
         $sql = <<< SQL
@@ -147,7 +147,7 @@ SQL;
 
     }
 
-    private function get_modules_node($id) {
+    public function get_modules_node($id) {
         global $DB;
         
         $sql = <<< SQL
@@ -185,7 +185,7 @@ SQL;
         return $array;
     }
 
-    private function get_course_node($id) {
+    public function get_course_node($id) {
         global $DB;
         
         $sql = <<< SQL
