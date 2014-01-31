@@ -54,12 +54,12 @@ class modulereport_ajax {
             SELECT cc.id,cc.name, count(cm.id) totalModuleCount 
                 FROM {course_categories} cc
             LEFT OUTER JOIN {course_categories} cc2
-                ON cc.depth<=cc2.depth AND CONCAT(cc2.path,'/') LIKE CONCAT (cc.path,'/%')
+                ON cc.depth <= cc2.depth AND CONCAT(cc2.path,'/') LIKE CONCAT (cc.path,'/%')
             LEFT OUTER JOIN {course} c
                 ON c.category = cc2.id
             LEFT OUTER JOIN {course_modules} cm
-                ON cm.course=c.id
-            WHERE cc.depth=1 
+                ON cm.course = c.id
+            WHERE cc.depth = 1 
                 AND cc.id <>1
             GROUP BY cc.id;
 SQL;
