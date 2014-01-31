@@ -73,7 +73,7 @@ SQL;
             unset($value->totalmodulecount); 
             $value->children = $this->get_children_node($value->id); 
             $value->courses = $this->get_courses_node($value->id); 
-            array_push($array,$value);
+            array_push($array, $value);
         }
         return $array;
     }
@@ -136,11 +136,11 @@ SQL;
         ));
 
         $array = array();
-        foreach ($data as $key=>$value) {
-            $value->moduleCount =  $this->get_modules_node($value->id); 
-            $value->totalModuleCount =  $value->totalmodulecount; 
+        foreach ($data as $key => $value) {
+            $value->moduleCount = $this->get_modules_node($value->id); 
+            $value->totalModuleCount = $value->totalmodulecount; 
             unset($value->totalmodulecount); 
-            array_push($array,$value);
+            array_push($array, $value);
         }
         return $array;
 
@@ -176,8 +176,10 @@ SQL;
         ));
 
         $array = array();
-        foreach ($data as $key=>$value) {
-            $array = array_merge($array,array($value->name=>$value->cnt));
+        foreach ($data as $key => $value) {
+            $array = array_merge($array, array(
+                $value->name => $value->cnt
+            ));
         }
         return $array;
     }
@@ -206,8 +208,10 @@ SQL;
         ));
 
         $array = array();
-        foreach ($data as $key=>$value) {
-            $array = array_merge($array,array($value->name=>$value->cnt));
+        foreach ($data as $key => $value) {
+            $array = array_merge($array, array(
+                $value->name => $value->cnt
+            ));
         }
         return $array;
     }
