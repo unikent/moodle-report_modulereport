@@ -147,23 +147,25 @@ SQL;
         global $DB;
         
         $sql = <<< SQL
-SELECT m.name, count(cm2.id) cnt
-FROM {modules} m
-LEFT OUTER JOIN (
-SELECT cm.id, cm.module
-FROM {course_modules} cm
-JOIN {course} c
-ON cm.course=c.id
-JOIN {course_categories} cc2
-ON c.category = cc2.id
-JOIN {course_categories} cc
-ON cc.depth<=cc2.depth AND CONCAT(cc2.path,'/') LIKE CONCAT (cc.path,'/%')
-AND cc.id=:id
-GROUP BY c.id, cm.module) cm2
-ON cm2.module = m.id
-WHERE exists (SELECT 1 FROM {course_modules} WHERE module = m.id)
-GROUP BY m.name
-ORDER BY m.name
+            SELECT m.name, count(cm2.id) cnt
+                FROM {modules} m
+                LEFT OUTER JOIN (
+                    SELECT cm.id, cm.module
+                        FROM {course_modules} cm
+                    JOIN {course} c
+                        ON cm.course = c.id
+                    JOIN {course_categories} cc2
+                        ON c.category = cc2.id
+                    JOIN {course_categories} cc
+                        ON cc.depth <= cc2.depth
+                        AND CONCAT(cc2.path,'/') LIKE CONCAT (cc.path,'/%')
+                        AND cc.id=:id
+                    GROUP BY c.id, cm.module
+                ) cm2
+                    ON cm2.module = m.id
+            WHERE exists (SELECT 1 FROM {course_modules} WHERE module = m.id)
+            GROUP BY m.name
+            ORDER BY m.name
 SQL;
 
         $params = array('id' => $id);
