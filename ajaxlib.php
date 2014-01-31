@@ -51,27 +51,28 @@ class modulereport_ajax {
         global $DB;
         
         $sql = <<< SQL
-SELECT cc.id,cc.name, count(cm.id) totalModuleCount 
-FROM {course_categories} cc
-LEFT OUTER JOIN {course_categories} cc2
-ON cc.depth<=cc2.depth and CONCAT(cc2.path,'/') like CONCAT (cc.path,'/%')
-LEFT OUTER JOIN {course} c
-ON c.category = cc2.id
-LEFT OUTER JOIN {course_modules} cm
-ON cm.course=c.id
-where cc.depth=1 
-and cc.id <>1
-group by cc.id;
+            SELECT cc.id,cc.name, count(cm.id) totalModuleCount 
+                FROM {course_categories} cc
+            LEFT OUTER JOIN {course_categories} cc2
+                ON cc.depth<=cc2.depth AND CONCAT(cc2.path,'/') LIKE CONCAT (cc.path,'/%')
+            LEFT OUTER JOIN {course} c
+                ON c.category = cc2.id
+            LEFT OUTER JOIN {course_modules} cm
+                ON cm.course=c.id
+            WHERE cc.depth=1 
+                AND cc.id <>1
+            GROUP BY cc.id;
 SQL;
 
-        $array = array();
         $data = $DB->get_records_sql($sql, array());
+
+        $array = array();
         foreach ($data as $key => $value) {
-            $value->moduleCount =  $this->get_modules_node($value->id); 
-            $value->totalModuleCount =  $value->totalmodulecount; 
+            $value->moduleCount = $this->get_modules_node($value->id); 
+            $value->totalModuleCount = $value->totalmodulecount; 
             unset($value->totalmodulecount); 
-            $value->children =  $this->get_children_node($value->id); 
-            $value->courses =  $this->get_courses_node($value->id); 
+            $value->children = $this->get_children_node($value->id); 
+            $value->courses = $this->get_courses_node($value->id); 
             array_push($array,$value);
         }
         return $array;
@@ -81,31 +82,32 @@ SQL;
         global $DB;
         
         $sql = <<< SQL
-SELECT cc2.id,cc2.name, count(cm.id) totalModuleCount 
-FROM {course_categories} cc
-JOIN {course_categories} cc2
-ON cc.depth=cc2.depth-1 and CONCAT(cc2.path,'/') like CONCAT (cc.path,'/%')
-LEFT OUTER JOIN {course_categories} cc3
-ON cc2.depth<=cc3.depth and cc3.path like CONCAT (cc2.path,'%')
-LEFT OUTER JOIN {course} c
-ON c.category = cc3.id
-LEFT OUTER JOIN {course_modules} cm
-ON cm.course=c.id
-where cc.id=:id
-group by cc2.id;
+            SELECT cc2.id, cc2.name, count(cm.id) totalModuleCount 
+                FROM {course_categories} cc
+                JOIN {course_categories} cc2
+                    ON cc.depth = cc2.depth-1 AND CONCAT(cc2.path,'/') LIKE CONCAT (cc.path,'/%')
+                LEFT OUTER JOIN {course_categories} cc3
+                    ON cc2.depth <= cc3.depth AND cc3.path LIKE CONCAT (cc2.path,'%')
+                LEFT OUTER JOIN {course} c
+                    ON c.category = cc3.id
+                LEFT OUTER JOIN {course_modules} cm
+                    ON cm.course = c.id
+            WHERE cc.id = :id
+            GROUP BY cc2.id;
 SQL;
 
-        $params = array('id' => $id);
-        $data = $DB->get_records_sql($sql, $params);
+        $data = $DB->get_records_sql($sql, array(
+            'id' => $id
+        ));
 
-        $array=array();
-        foreach ($data as $key=>$value) {
-            $value->moduleCount =  $this->get_modules_node($value->id); 
-            $value->totalModuleCount =  $value->totalmodulecount; 
+        $array = array();
+        foreach ($data as $key => $value) {
+            $value->moduleCount = $this->get_modules_node($value->id); 
+            $value->totalModuleCount = $value->totalmodulecount; 
             unset($value->totalmodulecount); 
-            $value->children =  $this->get_children_node($value->id); 
-            $value->courses =  $this->get_courses_node($value->id); 
-            array_push($array,$value);
+            $value->children = $this->get_children_node($value->id); 
+            $value->courses = $this->get_courses_node($value->id); 
+            array_push($array, $value);
         }
 
         return $array;
@@ -116,23 +118,24 @@ SQL;
         global $DB;
         
         $sql = <<< SQL
-SELECT c.id, c.shortname name, count(cm.id) totalModuleCount 
-FROM  {course} c
-JOIN {course_modules} cm
-ON cm.course=c.id
-JOIN {modules} m
-ON cm.module = m.id
-JOIN {course_categories} cc
-ON c.category = cc.id
-AND cc.id=:id
-group by c.id
-ORDER BY c.shortname;
+            SELECT c.id, c.shortname name, count(cm.id) totalModuleCount 
+                FROM  {course} c
+                JOIN {course_modules} cm
+                    ON cm.course = c.id
+                JOIN {modules} m
+                    ON cm.module = m.id
+                JOIN {course_categories} cc
+                    ON c.category = cc.id
+                    AND cc.id = :id
+            GROUP BY c.id
+            ORDER BY c.shortname;
 SQL;
 
-        $params = array('id' => $id);
-        $data = $DB->get_records_sql($sql, $params);
+        $data = $DB->get_records_sql($sql, array(
+            'id' => $id
+        ));
 
-        $array=array();
+        $array = array();
         foreach ($data as $key=>$value) {
             $value->moduleCount =  $this->get_modules_node($value->id); 
             $value->totalModuleCount =  $value->totalmodulecount; 
@@ -168,10 +171,11 @@ SQL;
             ORDER BY m.name
 SQL;
 
-        $params = array('id' => $id);
-        $data = $DB->get_records_sql($sql, $params);
+        $data = $DB->get_records_sql($sql, array(
+            'id' => $id
+        ));
 
-        $array=array();
+        $array = array();
         foreach ($data as $key=>$value) {
             $array = array_merge($array,array($value->name=>$value->cnt));
         }
@@ -197,10 +201,11 @@ SQL;
             ORDER BY m.name;
 SQL;
 
-        $params = array('id' => $id);
-        $data = $DB->get_records_sql($sql, $params);
+        $data = $DB->get_records_sql($sql, array(
+            'id' => $id
+        ));
 
-        $array=array();
+        $array = array();
         foreach ($data as $key=>$value) {
             $array = array_merge($array,array($value->name=>$value->cnt));
         }
