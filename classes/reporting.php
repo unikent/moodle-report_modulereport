@@ -39,13 +39,13 @@ class reporting {
 		global $DB;
 
 		$sql = <<<SQL
-			SELECT cm.id, cm.module, COUNT(cm.module) mcount, cc.path catpath
+			SELECT cm.id, cm.module, c.id cid, COUNT(cm.module) mcount, cc.path catpath
 				FROM {course_modules} cm
 			JOIN {course} c
 				ON cm.course = c.id
 			JOIN {course_categories} cc
 				ON c.category = cc.id
-			GROUP BY cm.module, cc.id
+			GROUP BY cm.module, cc.id, c.id
 SQL;
 		$records = $DB->get_records_sql($sql);
 
