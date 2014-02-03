@@ -32,7 +32,7 @@ foreach ($categories as $data) {
 
 	foreach ($modules as $module => $count) {
 		if (!in_array($module, $table->head)) {
-			$table->head[] = $db_modules[$module];
+			$table->head[] = get_string('modulename', 'mod_' . $db_modules[$module]);
 		}
 	}
 }
