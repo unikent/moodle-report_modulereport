@@ -20,7 +20,7 @@ $table->head = array(
 $table->attributes = array('class' => 'admintable generaltable');
 $table->data = array();
 
-// Populate table
+// Populate table.
 foreach ($categories as $data) {
 	$category = $data['category'];
 	$modules = $data['modules'];
@@ -39,7 +39,7 @@ foreach ($categories as $data) {
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string("modulereport", "report_modulereport"));
-echo $OUTPUT->box_start();
+echo $OUTPUT->box_start('overflowbox');
 echo html_writer::table($table);
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer();
