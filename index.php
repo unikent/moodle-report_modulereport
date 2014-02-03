@@ -31,8 +31,9 @@ foreach ($categories as $data) {
 	));
 
 	foreach ($modules as $module => $count) {
-		if (!in_array($module, $table->head)) {
-			$table->head[] = get_string('modulename', 'mod_' . $db_modules[$module]);
+		$str = get_string('modulename', 'mod_' . $db_modules[$module]);
+		if (!in_array($str, $table->head)) {
+			$table->head[] = $str;
 		}
 	}
 }
