@@ -38,6 +38,13 @@ M.report_modulereport = {
 	},
 
     cellClick : function(Y, cell) {
+        var mid = cell.getAttribute("mid");
+        var cid = cell.getAttribute("cid");
+
+        if (!mid || !cid || cell.getHTML() == "0") {
+            return;
+        }
+
         var dialog = new Y.Panel({
             contentBox : Y.Node.create('<div id="dialog" />'),
             bodyContent: '<div id="modalmessage"></div>',
@@ -72,8 +79,8 @@ M.report_modulereport = {
             method: "GET",
             data: {
                 sesskey: M.cfg.sesskey,
-                mid: cell.getAttribute("mid"),
-                cid: cell.getAttribute("cid")
+                mid: mid,
+                cid: cid
             },
             on: {
                 success: function (x, o) {
