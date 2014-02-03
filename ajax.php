@@ -27,14 +27,19 @@ $table->attributes = array('class' => 'admintable generaltable');
 $table->data = array();
 
 // Populate table.
-foreach ($categories as $data) {
+foreach ($categories as $cid => $data) {
 	$category = $data['category'];
 	$modules = $data['modules'];
 
-	$table->data[] = new html_table_row(array_merge(
-		array($category),
-		$modules
-	));
+	$cells = array($category);
+	foreach ($modules as $mid => $mod) {
+		$cell = new \html_table_cell($mod);
+		$cell->attributes['cid'] = $cid;
+		$cell->attributes['mid'] = $mid;
+		$cells[] = $cell;
+	}
+
+	$table->data[] = new \html_table_row($cells);
 
 	foreach ($modules as $module => $count) {
 		$str = get_string('modulename', 'mod_' . $db_modules[$module]);

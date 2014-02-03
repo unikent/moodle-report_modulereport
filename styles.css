@@ -1,3 +1,11 @@
 .overflowbox {
 	overflow: auto;
 }
+
+.modulereportbox .cell {
+	cursor: pointer;
+}
+
+#modalmessage .spinner {
+	margin-left: 380px;
+}

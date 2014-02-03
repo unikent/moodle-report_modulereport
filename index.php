@@ -14,7 +14,7 @@ $PAGE->requires->jquery_plugin('ui-css');
 $PAGE->requires->js_init_call('M.report_modulereport.init', array(), false, array(
     'name' => 'report_modulereport',
     'fullpath' => '/report/modulereport/module.js',
-	'requires' => array("node", "io", "dump", "json-parse")
+	'requires' => array("node", "io", "dump", "json-parse", "panel")
 ));
 
 admin_externalpage_setup('reportmodulereport', '', null, '', array('pagelayout' => 'report'));
