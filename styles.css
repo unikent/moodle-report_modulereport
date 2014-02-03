@@ -6,6 +6,10 @@
 	cursor: pointer;
 }
 
+.modulereportbox .module_cell:hover {
+	background: #cecece;
+}
+
 #modalmessage .spinner {
 	margin-left: 186px;
 }
