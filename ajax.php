@@ -2,6 +2,8 @@
 
 define('AJAX_SCRIPT', true);
 
+global $CFG;
+
 /** Include config */
 require_once(dirname(__FILE__) . '/../../config.php');
 
@@ -24,8 +26,12 @@ if (!empty($cid) && !empty($mid)) {
 	$table->data = array();
 
 	foreach ($list as $item) {
+		$name_cell = new \html_table_cell(html_writer::tag('a', $item->shortname, array(
+			'href' => $CFG->wwwroot . "/course/view.php?id=" . $item->cid,
+			'target' => '_blank'
+		)));
 		$table->data[] = new \html_table_row(array(
-			$item->shortname,
+			$name_cell,
 			$item->mcount
 		));
 	}

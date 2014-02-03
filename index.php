@@ -42,7 +42,6 @@ if (isset($format) && $format === "csv") {
 	die;
 }
 
-
 $PAGE->requires->js_init_call('M.report_modulereport.init', array(), false, array(
     'name' => 'report_modulereport',
     'fullpath' => '/report/modulereport/module.js',

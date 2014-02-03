@@ -96,7 +96,7 @@ SQL;
 		global $DB;
 
 		$sql = <<<SQL
-			SELECT cm.id, c.shortname, COUNT(cm.module) mcount
+			SELECT cm.id, c.id as cid, c.shortname, COUNT(cm.module) mcount
 				FROM {course_modules} cm
 			JOIN {course} c
 				ON cm.course = c.id
