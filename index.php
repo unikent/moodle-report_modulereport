@@ -6,45 +6,42 @@ require_once($CFG->libdir.'/filelib.php');
 global $PAGE, $OUTPUT;
 
 $PAGE->set_context(context_system::instance());
-
 $PAGE->set_url('/report/modulereport/index.php');
-$PAGE->set_pagelayout('datool');
 
-require_login();
+admin_externalpage_setup('reportmodulereport', '', null, '', array('pagelayout'=>'report'));
 
-/**
- * jQuery
- */
-$PAGE->requires->jquery();
-$PAGE->requires->jquery_plugin('ui');
-$PAGE->requires->jquery_plugin('ui-css');
-$PAGE->requires->js_init_call('M.report_modulereport.init', array(), false, array(
-    'name' => 'report_modulereport',
-    'fullpath' => '/report/modulereport/module.js',
-	'requires' => array("node", "io", "dump", "json-parse")
-));
+$counts = \report_modulereport\reporting::get_modules_by_category();
 
-/**
- * Our CSS
- */
-$PAGE->requires->css('/report/modulereport/styles/styles.css');
+$table = new \html_table();
+$table->head = array(
+    get_string("category")
+);
+$table->attributes = array('class' => 'admintable generaltable');
+$table->data = array();
+
+// Add each module to the header
+$modules = array();
+foreach ($counts as $data) {
+	if (!in_array($data['module'], $modules)) {
+		$table->head[] = $data['module'];
+		$modules[] = $data['module'];
+	}
+}
+
+foreach ($modules as $module) {
+	foreach ($counts as $data) {
+		$cells = array(
+			$data['category'],
+			$data['module'],
+			$data['count']
+		);
+		$table->data[] = new html_table_row($cells);
+	}
+}
 
 echo $OUTPUT->header();
-?>
-
-<h1 class="main_title">Moodle module usage report</h1>
-
-<div id='module-list' title='Module list'>
-	
-</div>
-
-<div id="tabs">
-	<ul id='faculty-list'>
-		<!--<li><a href="#tabs-1">Faculty of Science. Technology and Medical Studies</a></li>
-		<li><a href="#tabs-2">Faculty of Humanities</a></li>
-		<li><a href="#tabs-3">Faculty of Scocial Sciences</a></li>-->
-	</ul>
-</div>
-
-<?php
+echo $OUTPUT->heading(get_string("modulereport", "report_modulereport"));
+echo $OUTPUT->box_start();
+echo html_writer::table($table);
+echo $OUTPUT->box_end();
 echo $OUTPUT->footer();
