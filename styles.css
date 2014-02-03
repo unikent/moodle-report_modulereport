@@ -2,10 +2,10 @@
 	overflow: auto;
 }
 
-.modulereportbox .cell {
+.modulereportbox .module_cell {
 	cursor: pointer;
 }
 
 #modalmessage .spinner {
-	margin-left: 380px;
+	margin-left: 186px;
 }

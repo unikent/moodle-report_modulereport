@@ -39,7 +39,7 @@ M.report_modulereport = {
                             });
                         }
                     } catch (e) {
-                        box.setHTML('Error.');
+                        box.setHTML('Error');
                     }
                 }
             }
@@ -80,11 +80,20 @@ M.report_modulereport = {
             timeout: 120000,
             method: "GET",
             data: {
-                sesskey: M.cfg.sesskey
+                sesskey: M.cfg.sesskey,
+                mid: cell.getAttribute("mid"),
+                cid: cell.getAttribute("cid")
             },
             on: {
                 success: function (x, o) {
                     spinner.hide();
+
+                    try {
+                        var data = Y.JSON.parse(o.responseText);
+                        box.setHTML(data.content);
+                    } catch (e) {
+                        box.setHTML('Error');
+                    }
                 }
             }
         });

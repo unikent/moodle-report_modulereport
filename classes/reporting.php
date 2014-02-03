@@ -85,6 +85,32 @@ SQL;
 	}
 
 	/**
+	 * Returns a list of Module instances within a category
+	 * 
+	 * @global $DB
+	 */
+	public static function get_instances_for_category($catid, $moduleid) {
+		global $DB;
+
+		$sql = <<<SQL
+			SELECT cm.id, c.shortname, COUNT(cm.module) mcount
+				FROM {course_modules} cm
+			JOIN {course} c
+				ON cm.course = c.id
+			JOIN {course_categories} cc
+				ON c.category = cc.id
+			WHERE (cc.path LIKE :cpath1 OR cc.path LIKE :cpath2) AND cm.module = :mid
+			GROUP BY cm.module, c.id
+SQL;
+
+		return $DB->get_records_sql($sql, array(
+			"cpath1" => "%/" . $catid . "/%",
+			"cpath2" => "%/" . $catid,
+			"mid" => $moduleid
+		));
+	}
+
+	/**
 	 * Returns a list of category ids and category names.
 	 */
 	public static function get_categories() {
