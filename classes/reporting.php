@@ -119,7 +119,7 @@ SQL;
 	public static function get_categories() {
 		global $DB;
 
-		$records = $DB->get_records("course_categories", null, '', $fields='id, name');
+		$records = $DB->get_records("course_categories", null, '', 'id, name');
 
 		$data = array();
 		foreach ($records as $record) {
@@ -134,7 +134,7 @@ SQL;
 	public static function get_modules() {
 		global $DB;
 
-		$records = $DB->get_records("modules", null, '', $fields='id, name');
+		$records = $DB->get_records("modules", null, '', 'id, name');
 
 		$data = array();
 		foreach ($records as $record) {
