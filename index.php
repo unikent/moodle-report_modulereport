@@ -11,6 +11,7 @@ $PAGE->set_url('/report/modulereport/index.php');
 admin_externalpage_setup('reportmodulereport', '', null, '', array('pagelayout'=>'report'));
 
 $categories = \report_modulereport\reporting::get_modules_by_category();
+$db_modules = \report_modulereport\reporting::get_modules();
 
 $table = new \html_table();
 $table->head = array(
@@ -31,7 +32,7 @@ foreach ($categories as $data) {
 
 	foreach ($modules as $module => $count) {
 		if (!in_array($module, $table->head)) {
-			$table->head[] = $module;
+			$table->head[] = $db_modules[$module];
 		}
 	}
 }

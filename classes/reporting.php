@@ -39,48 +39,45 @@ class reporting {
 		global $DB;
 
 		$sql = <<<SQL
-			SELECT cm2.id, cm2.catid categoryid, cm2.catname categoryname, cm2.catpath categorypath, m.name modulename, count(cm2.id) cnt
-				FROM mdl_modules m
-				LEFT OUTER JOIN (
-					SELECT cc.id catid, cc.name catname, cc.path catpath, cm.id, cm.module
-						FROM mdl_course_modules cm
-					JOIN mdl_course c
-						ON cm.course = c.id
-					JOIN mdl_course_categories cc
-						ON c.category = cc.id
-					GROUP BY c.id, cm.module
-				) cm2
-					ON cm2.module = m.id
-			WHERE exists (SELECT 1 FROM mdl_course_modules WHERE module = m.id)
-			GROUP BY m.name
-			ORDER BY cm2.catname
+			SELECT cm.id, cm.module, COUNT(cm.module) mcount, cc.path catpath
+				FROM {course_modules} cm
+			JOIN {course} c
+				ON cm.course = c.id
+			JOIN {course_categories} cc
+				ON c.category = cc.id
+			GROUP BY cm.module, cc.id
 SQL;
 		$records = $DB->get_records_sql($sql);
 
 		// Stores an array of mappings for category ID -> category name.
 		$categories = static::get_categories();
 
-		// Grab a list of all the modules we have.
-		$modules = static::get_modules($records);
+		// Stores an array of mappings for module ID -> module name.
+		$modules = static::get_modules();
+
+		// Placeholder set of 0 counts.
+		$module_counts = array_map(function($a) {
+			return 0;
+		}, $modules);
 
 		// Go through every category, setup the data array for it.
 		$data = array();
 		foreach ($categories as $catid => $catname) {
 			$data[$catid] = array(
 				"category" => $catname,
-				"modules" => $modules
+				"modules" => $module_counts
 			);
 		}
 
 		// Update all the counts.
 		foreach ($records as $record) {
 			// Grab a list of categories to update.
-			$path = $record->categorypath;
+			$path = $record->catpath;
 			$paths = explode('/', $path);
 			$categories = array_filter($paths, "strlen");
 
 			foreach ($categories as $catid) {
-				$data[$catid]["modules"][$record->modulename] += (int)$record->cnt;
+				$data[$catid]["modules"][$record->module] += (int)$record->mcount;
 			}
 		}
 		
@@ -90,7 +87,7 @@ SQL;
 	/**
 	 * Returns a list of category ids and category names.
 	 */
-	private static function get_categories() {
+	public static function get_categories() {
 		global $DB;
 
 		$records = $DB->get_records("course_categories", null, '', $fields='id, name');
@@ -103,14 +100,16 @@ SQL;
 	}
 
 	/**
-	 * Returns a list of modules in a given dataset
+	 * Returns a list of modules.
 	 */
-	private static function get_modules($records) {
+	public static function get_modules() {
+		global $DB;
+
+		$records = $DB->get_records("modules", null, '', $fields='id, name');
+
 		$data = array();
 		foreach ($records as $record) {
-			if (!isset($data[$record->modulename])) {
-				$data[$record->modulename] = 0;
-			}
+			$data[$record->id] = $record->name;
 		}
 		return $data;
 	}
