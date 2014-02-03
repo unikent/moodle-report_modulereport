@@ -3,18 +3,9 @@ M.report_modulereport = {
     transaction : [],
 
 	init: function (Y) {
-        var box = Y.one('.modulereportbox');
+        var box = Y.one('.modulereportbox .contents');
 		var spinner = M.util.add_spinner(Y, box);
 		spinner.show();
-
-        $('#module-list').dialog({
-            modal: true,
-            autoOpen: false,
-            width: 350,
-            height: 400,
-            resizable: false,
-            draggable: false
-        });
 
         Y.io(M.cfg.wwwroot + "/report/modulereport/ajax.php", {
             timeout: 120000,

@@ -1,13 +1,19 @@
-.modulereportbox {
-	overflow: auto;
-	height: 650px;
+.modulereportbox .floatright {
+	float: right;
+	margin: 0 0 2px 0;
 }
 
-.modulereportbox .module_cell {
+.modulereportbox .contents {
+	overflow: auto;
+	height: 650px;
+	clear: both;
+}
+
+.modulereportbox .contents .module_cell {
 	cursor: pointer;
 }
 
-.modulereportbox .module_cell:hover {
+.modulereportbox .contents .module_cell:hover {
 	background: #cecece;
 }
 
