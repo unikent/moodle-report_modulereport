@@ -57,53 +57,37 @@ class reporting {
 SQL;
 		$records = $DB->get_records_sql($sql);
 
+		// Stores an array of mappings for category ID -> category name.
+		$categories = static::get_categories();
 
-		// Stores an array of mappings for parent categories.
-		$catmap = array();
+		// Grab a list of all the modules we have.
+		$modules = static::get_modules($records);
 
-		// Data to return.
+		// Go through every category, setup the data array for it.
 		$data = array();
-
-		$i = 0;
-		foreach ($records as $record) {
-			// For evey child, add or update a record for the parents, with the combined total
-			// of all children.
-			$path = $record->categorypath;
-			$paths = explode('/', $path);
-			$parents = array_slice($paths, 0, count($paths) - 1);
-			foreach ($parents as $parent) {
-				if (!isset($categories[$parent])) {
-					continue;
-				}
-
-				$catmap_key = $parent . "_" . $record->modulename;
-
-				if (!isset($catmap[$catmap_key])) {
-					// Grab the category name.
-					$category = $categories[$parent];
-					$id = $i++;
-					$catmap[$catmap_key] = $id;
-
-					// Add to data
-					$data[$id] = array(
-						"category" => $category,
-						"module" => $record->modulename,
-						"count" => (int)$record->cnt
-					);
-				}
-
-				$ptr = $catmap[$catmap_key];
-				$data[$ptr]['count'] += (int)$record->cnt;
+		foreach ($categories as $catid => $catname) {
+			$modules = array();
+			foreach ($modules as $module) {
+				$modules[$module] = 0;
 			}
-
-			// Add to data
-			$data[$i++] = array(
-				"category" => $record->categoryname,
-				"module" => $record->modulename,
-				"count" => (int)$record->cnt
+			$data[$catid] = array(
+				"category" => $catname,
+				"modules" => $modules
 			);
 		}
 
+		// Update all the counts.
+		foreach ($records as $record) {
+			// Grab a list of categories to update.
+			$path = $record->categorypath;
+			$paths = explode('/', $path);
+			$categories = array_filter($paths, "strlen");
+
+			foreach ($categories as $catid) {
+				$data[$catid]["modules"][$record->modulename] += (int)$record->cnt;
+			}
+		}
+		
 		return $data;
 	}
 
