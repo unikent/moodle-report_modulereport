@@ -77,7 +77,10 @@ SQL;
 			$categories = array_filter($paths, "strlen");
 
 			foreach ($categories as $catid) {
-				$data[$catid]["modules"][$record->module] += (int)$record->mcount;
+				// This totals the number of courses using the module, rather than the total
+				// number of instances (+= mcount)
+				// CR996
+				$data[$catid]["modules"][$record->module]++;
 			}
 		}
 		
