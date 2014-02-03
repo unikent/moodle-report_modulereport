@@ -4,31 +4,46 @@ define('AJAX_SCRIPT', true);
 
 /** Include config */
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once(dirname(__FILE__) . '/ajaxlib.php');
 
 if (!has_capability('moodle/site:config', \context_system::instance())) {
 	die(json_encode(array("error" => "Not allowed!")));
 }
 
-$data = optional_param('sort', 'all', PARAM_ALPHA);
-$school = optional_param('school', null, PARAM_INT);
+$cid = optional_param('cid', null, PARAM_INT);
+$mid = optional_param('mid', null, PARAM_INT);
 
-$ajax = new modulereport_ajax();
-
-$content = '';
-
-switch ($data) {
-	case 'categories':
-		$content = $ajax->get_root_node();
-		break;
-	case 'course':
-		$content = $ajax->get_modules_node($school);
-		break;
-	case 'all':
-	default:
-		$content = $ajax->get_content();
-		$content = $content->data;
-		break;
+if (!empty($cid) && !empty($mid)) {
+	die;
 }
 
-echo json_encode($content, JSON_NUMERIC_CHECK);
+$categories = \report_modulereport\reporting::get_modules_by_category();
+$db_modules = \report_modulereport\reporting::get_modules();
+
+$table = new \html_table();
+$table->head = array(
+    get_string("category")
+);
+$table->attributes = array('class' => 'admintable generaltable');
+$table->data = array();
+
+// Populate table.
+foreach ($categories as $data) {
+	$category = $data['category'];
+	$modules = $data['modules'];
+
+	$table->data[] = new html_table_row(array_merge(
+		array($category),
+		$modules
+	));
+
+	foreach ($modules as $module => $count) {
+		$str = get_string('modulename', 'mod_' . $db_modules[$module]);
+		if (!in_array($str, $table->head)) {
+			$table->head[] = $str;
+		}
+	}
+}
+
+echo json_encode(array(
+	"content" => \html_writer::table($table)
+));
