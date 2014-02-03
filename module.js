@@ -25,7 +25,7 @@ M.report_modulereport = {
                         else {
                             box.setHTML(data.content);
 
-                            Y.all('.cell').on('click', function (e) {
+                            Y.all('.module_cell').on('click', function (e) {
                                 M.report_modulereport.cellClick(Y, e.target);
                             });
                         }
