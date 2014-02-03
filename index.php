@@ -10,7 +10,7 @@ $PAGE->set_url('/report/modulereport/index.php');
 
 admin_externalpage_setup('reportmodulereport', '', null, '', array('pagelayout'=>'report'));
 
-$counts = \report_modulereport\reporting::get_modules_by_category();
+$categories = \report_modulereport\reporting::get_modules_by_category();
 
 $table = new \html_table();
 $table->head = array(
@@ -19,23 +19,20 @@ $table->head = array(
 $table->attributes = array('class' => 'admintable generaltable');
 $table->data = array();
 
-// Add each module to the header
-$modules = array();
-foreach ($counts as $data) {
-	if (!in_array($data['module'], $modules)) {
-		$table->head[] = $data['module'];
-		$modules[] = $data['module'];
-	}
-}
+// Populate table
+foreach ($categories as $data) {
+	$category = $data['category'];
+	$modules = $data['modules'];
 
-foreach ($modules as $module) {
-	foreach ($counts as $data) {
-		$cells = array(
-			$data['category'],
-			$data['module'],
-			$data['count']
-		);
-		$table->data[] = new html_table_row($cells);
+	$table->data[] = new html_table_row(array_merge(
+		array($category),
+		$modules
+	));
+
+	foreach ($modules as $module => $count) {
+		if (!in_array($module, $table->head)) {
+			$table->head[] = $module;
+		}
 	}
 }
 

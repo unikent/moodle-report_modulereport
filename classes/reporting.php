@@ -66,10 +66,6 @@ SQL;
 		// Go through every category, setup the data array for it.
 		$data = array();
 		foreach ($categories as $catid => $catname) {
-			$modules = array();
-			foreach ($modules as $module) {
-				$modules[$module] = 0;
-			}
 			$data[$catid] = array(
 				"category" => $catname,
 				"modules" => $modules
@@ -112,8 +108,8 @@ SQL;
 	private static function get_modules($records) {
 		$data = array();
 		foreach ($records as $record) {
-			if (!in_array($record->modulename, $data)) {
-				$data[] = $record->modulename;
+			if (!isset($data[$record->modulename])) {
+				$data[$record->modulename] = 0;
 			}
 		}
 		return $data;
