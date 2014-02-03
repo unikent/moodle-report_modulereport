@@ -20,7 +20,6 @@ $table = new \html_table();
 if (!empty($cid) && !empty($mid)) {
 	$list = \report_modulereport\reporting::get_instances_for_category($cid, $mid);
 
-	$table = new \html_table();
 	$table->head = array(get_string('courseshortname', 'hub'), get_string('count', 'tag'));
 	$table->attributes = array('class' => 'admintable generaltable');
 	$table->data = array();
@@ -44,6 +43,10 @@ else {
 	$table->head = array(
 	    get_string("category")
 	);
+	foreach ($db_modules as $id => $module) {
+		$table->head[] = get_string('modulename', 'mod_' . $module);
+	}
+
 	$table->attributes = array('class' => 'admintable generaltable');
 	$table->data = array();
 
@@ -62,13 +65,6 @@ else {
 		}
 
 		$table->data[] = new \html_table_row($cells);
-
-		foreach ($modules as $module => $count) {
-			$str = get_string('modulename', 'mod_' . $db_modules[$module]);
-			if (!in_array($str, $table->head)) {
-				$table->head[] = $str;
-			}
-		}
 	}
 }
 
