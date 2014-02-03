@@ -21,7 +21,7 @@ admin_externalpage_setup('reportmodulereport', '', null, '', array('pagelayout' 
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string("modulereport", "report_modulereport"));
-echo $OUTPUT->box_start('overflowbox modulereportbox');
+echo $OUTPUT->box_start('modulereportbox');
 echo $OUTPUT->box_end();
 echo '<div id="module-list" title="Module list"></div>';
 echo $OUTPUT->footer();

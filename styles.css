@@ -1,5 +1,6 @@
-.overflowbox {
+.modulereportbox {
 	overflow: auto;
+	height: 650px;
 }
 
 .modulereportbox .module_cell {
