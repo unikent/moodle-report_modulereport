@@ -35,6 +35,7 @@ if (isset($format) && $format === "csv") {
 		foreach ($data['modules'] as $mid => $mod) {
 			$line[] = $mod;
 		}
+
 		$csv[] = $line;
 	}
 
@@ -50,6 +51,7 @@ $PAGE->requires->js_init_call('M.report_modulereport.init', array(), false, arra
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string("modulereport", "report_modulereport"));
+echo $OUTPUT->notification(get_string("filter", "report_modulereport"));
 echo $OUTPUT->box_start('modulereportbox');
 	echo '<p class="floatright"><a href="?format=csv" target="_blank">Download CSV</a></p>';
 	echo $OUTPUT->box_start('contents');

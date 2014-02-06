@@ -9,3 +9,5 @@
 $string['modulereport'] = 'Module Usage Report';
 $string['pluginname'] = 'Module Usage Report';
 $string['modulereport:view'] = 'View Module usage report';
+
+$string['filter'] = 'Warning: This report filters out default modules such as the News Forum and the default Reading Lists module. These figures may appear to be inaccurate as a result.';

@@ -18,13 +18,13 @@
  * Version details.
  *
  * @package    report
- * @subpackage backups
- * @copyright  2007 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
+ * @subpackage modulereport
+ * @copyright  2014 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2014020600;       // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2014020601;       // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2013110500;       // Requires this Moodle version
 $plugin->component = 'report_modulereport'; // Full name of the plugin (used for diagnostics)
