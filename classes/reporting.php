@@ -39,7 +39,7 @@ class reporting {
 		global $DB;
 
 		$sql = <<<SQL
-			SELECT cm.id, cm.module, c.id cid, COUNT(cm.module) mcount, cc.path catpath
+			SELECT cm.id, cm.module, c.id cid, cm.instance, COUNT(cm.module) mcount, cc.path catpath
 				FROM {course_modules} cm
 			JOIN {course} c
 				ON cm.course = c.id
@@ -80,10 +80,13 @@ SQL;
 				// This totals the number of courses using the module, rather than the total
 				// number of instances (+= mcount)
 				// CR996
-				$data[$catid]["modules"][$record->module]++;
+				if (static::filter_default("forum", "News forum", $record->module, $record->instance) &&
+					static::filter_default("aspirelists", "Reading list", $record->module, $record->instance)) {
+					$data[$catid]["modules"][$record->module]++;
+				}
 			}
 		}
-		
+
 		return $data;
 	}
 
@@ -96,7 +99,7 @@ SQL;
 		global $DB;
 
 		$sql = <<<SQL
-			SELECT cm.id, c.id as cid, c.shortname, COUNT(cm.module) mcount
+			SELECT cm.id, c.id as cid, cm.module, cm.instance, c.shortname, COUNT(cm.module) mcount
 				FROM {course_modules} cm
 			JOIN {course} c
 				ON cm.course = c.id
@@ -106,11 +109,21 @@ SQL;
 			GROUP BY cm.module, c.id
 SQL;
 
-		return $DB->get_records_sql($sql, array(
+		$data = $DB->get_records_sql($sql, array(
 			"cpath1" => "%/" . $catid . "/%",
 			"cpath2" => "%/" . $catid,
 			"mid" => $moduleid
 		));
+
+		$filtered_data = array();
+		foreach ($data as $record) {
+			if (static::filter_default("forum", "News forum", $record->module, $record->instance) &&
+				static::filter_default("aspirelists", "Reading list", $record->module, $record->instance)) {
+				$filtered_data[] = $record;
+			}
+		}
+
+		return $filtered_data;
 	}
 
 	/**
@@ -125,6 +138,7 @@ SQL;
 		foreach ($records as $record) {
 			$data[$record->id] = $record->name;
 		}
+
 		return $data;
 	}
 
@@ -140,6 +154,36 @@ SQL;
 		foreach ($records as $record) {
 			$data[$record->id] = $record->name;
 		}
+
 		return $data;
+	}
+
+	/**
+	 * Filter out default modules
+	 * 
+	 * @return boolean True if this is a default forum, else false.
+	 */
+	private static function filter_default($module_name, $module_title, $module, $moduleid) {
+		global $DB;
+
+		static $mod_type = array();
+		if (!isset($mod_type[$module_name])) {
+			$mod = $DB->get_record('modules', array(
+				'name' => $module_name
+			), 'id');
+			$mod_type[$module_name] = $mod->id;
+		}
+
+		// Is $module of this type?
+		if ($module !== $mod_type[$module_name]) {
+			return true;
+		}
+
+		// Is is!
+		$record = $DB->get_record($module_name, array(
+			'id' => $moduleid
+		));
+
+		return !$record || $record->name != $module_title;
 	}
 }
