@@ -69,6 +69,9 @@ SQL;
 			);
 		}
 
+		// Grab a list of IDs to filter out.
+		$exclusions = static::get_exclusions_list();
+
 		// Update all the counts.
 		foreach ($records as $record) {
 			// Grab a list of categories to update.
@@ -80,8 +83,7 @@ SQL;
 				// This totals the number of courses using the module, rather than the total
 				// number of instances (+= mcount)
 				// CR996
-				if (static::filter_default("forum", "News forum", $record->module, $record->instance) &&
-					static::filter_default("aspirelists", "Reading list", $record->module, $record->instance)) {
+				if (!isset($exclusions[$record->module]) || !in_array($record->instance, $exclusions[$record->module])) {
 					$data[$catid]["modules"][$record->module]++;
 				}
 			}
@@ -115,10 +117,13 @@ SQL;
 			"mid" => $moduleid
 		));
 
+		// Grab a list of IDs to filter out.
+		$exclusions = static::get_exclusions_list();
+
+		// Filter out certain modules.
 		$filtered_data = array();
 		foreach ($data as $record) {
-			if (static::filter_default("forum", "News forum", $record->module, $record->instance) &&
-				static::filter_default("aspirelists", "Reading list", $record->module, $record->instance)) {
+			if (!isset($exclusions[$record->module]) || !in_array($record->instance, $exclusions[$record->module])) {
 				$filtered_data[] = $record;
 			}
 		}
@@ -159,31 +164,46 @@ SQL;
 	}
 
 	/**
-	 * Filter out default modules
+	 * Returns a list of modules we should exclude
+	 */
+	private static function get_exclusions_list() {
+		global $DB;
+
+		// Grab the ID of the forum module.
+		$forum = $DB->get_record('modules', array(
+			'name' => 'forum'
+		), 'id');
+
+		// Grab the ID of the aspire lists module.
+		$lists = $DB->get_record('modules', array(
+			'name' => 'aspirelists'
+		), 'id');
+
+		return array(
+			$forum->id => static::filter_list("forum", "News forum"),
+			$lists->id => static::filter_list("aspirelists", "Reading list")
+		);
+	}
+
+	/**
+	 * Filter out default modules, this grabs a list of modules that need to be excluded.
 	 * 
 	 * @return boolean True if this is a default forum, else false.
 	 */
-	private static function filter_default($module_name, $module_title, $module, $moduleid) {
+	private static function filter_list($table_name, $module_title) {
 		global $DB;
 
-		static $mod_type = array();
-		if (!isset($mod_type[$module_name])) {
-			$mod = $DB->get_record('modules', array(
-				'name' => $module_name
-			), 'id');
-			$mod_type[$module_name] = $mod->id;
-		}
-
-		// Is $module of this type?
-		if ($module !== $mod_type[$module_name]) {
-			return true;
-		}
-
-		// Is is!
-		$record = $DB->get_record($module_name, array(
-			'id' => $moduleid
+		// Grab a list of IDs we can exclude.
+		$records = $DB->get_records_sql("SELECT id FROM {".$table_name."} WHERE name = :title", array(
+			'title' => $module_title
 		));
 
-		return !$record || $record->name != $module_title;
+		// Map to an array.
+		$ids = array();
+		foreach ($records as $record) {
+			$ids[] = $record->id;
+		}
+
+		return $ids;
 	}
 }
