@@ -2,7 +2,7 @@
 
 define('AJAX_SCRIPT', true);
 
-global $CFG;
+global $CFG, $DB;
 
 /** Include config */
 require_once(dirname(__FILE__) . '/../../config.php');
@@ -18,9 +18,17 @@ $table = new \html_table();
 
 // Are we printing a specific module?
 if (!empty($cid) && !empty($mid)) {
+	$module = $DB->get_record('modules', array(
+		'id' => $mid
+	));
+
 	$list = \report_modulereport\reporting::get_instances_for_category($cid, $mid);
 
 	$table->head = array(get_string('courseshortname', 'hub'), get_string('count', 'tag'));
+	if ($module->name == "forum") {
+		$table->head[] = "Post Count";
+	}
+
 	$table->attributes = array('class' => 'admintable generaltable');
 	$table->data = array();
 
@@ -29,13 +37,20 @@ if (!empty($cid) && !empty($mid)) {
 			'href' => $CFG->wwwroot . '/course/view.php?id=' . $item->cid,
 			'target' => '_blank'
 		)));
-		$table->data[] = new \html_table_row(array(
+
+		$row = array(
 			$name_cell,
 			$item->mcount
-		));
+		);
+
+		if ($module->name == "forum") {
+			// Also add a cell for post counts.
+			$row[] = \report_modulereport\reporting::get_forum_post_count($item->cid);
+		}
+
+		$table->data[] = new \html_table_row($row);
 	}
-}
-else {
+} else {
 	// Nope, print them all!
 	$categories = \report_modulereport\reporting::get_modules_by_category();
 	$db_modules = \report_modulereport\reporting::get_modules();
