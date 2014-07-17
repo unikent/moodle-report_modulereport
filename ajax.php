@@ -36,8 +36,17 @@ if (!empty($cid) && !empty($mid)) {
     $list = \report_modulereport\reporting::get_instances_for_category($cid, $mid);
 
     $table->head = array(get_string('courseshortname', 'hub'), get_string('count', 'tag'));
+
     if ($module->name == "forum") {
         $table->head[] = "Post Count";
+    }
+
+    if ($module->name == "ouwiki") {
+        $table->head[] = "Edit Count";
+    }
+
+    if ($module->name == "assignment") {
+        $table->head[] = "Assignment Submissions";
     }
 
     $table->attributes = array('class' => 'admintable generaltable');
@@ -58,6 +67,16 @@ if (!empty($cid) && !empty($mid)) {
             // Also add a cell for post counts.
             $obj = new \report_studentactivity\data();
             $row[] = $obj->forum_count($item->cid);
+        }
+
+        if ($module->name == "ouwiki") {
+            $obj = new \report_studentactivity\data();
+            $row[] = $obj->ouwiki_count($item->cid);
+        }
+
+        if ($module->name == "assignment") {
+            $obj = new \report_studentactivity\data();
+            $row[] = $obj->assignment_count($item->cid);
         }
 
         $table->data[] = new \html_table_row($row);
