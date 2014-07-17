@@ -38,16 +38,20 @@ class reporting {
     public static function get_modules_by_category() {
         global $DB;
 
+        list($wheres, $params) = static::get_exclusions_sql();
+        $wheres = 'WHERE ' . $wheres;
+
         $sql = <<<SQL
-            SELECT cm.id, cm.module, c.id cid, cm.instance, COUNT(cm.module) mcount, cc.path catpath
+            SELECT cm.id, c.id cid, cm.module, COUNT(cm.instance) mcount, cc.path catpath
                 FROM {course_modules} cm
             JOIN {course} c
                 ON cm.course = c.id
             JOIN {course_categories} cc
                 ON c.category = cc.id
+            $wheres
             GROUP BY cm.module, cc.id, c.id
 SQL;
-        $records = $DB->get_records_sql($sql);
+        $records = $DB->get_records_sql($sql, $params);
 
         // Stores an array of mappings for category ID -> category name.
         $categories = static::get_categories();
@@ -69,9 +73,6 @@ SQL;
             );
         }
 
-        // Grab a list of IDs to filter out.
-        $exclusions = static::get_exclusions_list();
-
         // Update all the counts.
         foreach ($records as $record) {
             // Grab a list of categories to update.
@@ -83,9 +84,7 @@ SQL;
                 // This totals the number of courses using the module, rather than the total
                 // number of instances (+= mcount)
                 // CR996.
-                if (!isset($exclusions[$record->module]) || !in_array($record->instance, $exclusions[$record->module])) {
-                    $data[$catid]["modules"][$record->module]++;
-                }
+                $data[$catid]["modules"][$record->module]++;
             }
         }
 
@@ -100,6 +99,11 @@ SQL;
     public static function get_instances_for_category($catid, $moduleid) {
         global $DB;
 
+        list($wheres, $params) = static::get_exclusions_sql();
+        $params["cpath1"] = "%/" . $catid . "/%";
+        $params["cpath2"] = "%/" . $catid;
+        $params["mid"] = $moduleid;
+
         $sql = <<<SQL
             SELECT cm.id, c.id as cid, cm.module, cm.instance, c.shortname, COUNT(cm.module) mcount
                 FROM {course_modules} cm
@@ -107,28 +111,11 @@ SQL;
                 ON cm.course = c.id
             JOIN {course_categories} cc
                 ON c.category = cc.id
-            WHERE (cc.path LIKE :cpath1 OR cc.path LIKE :cpath2) AND cm.module = :mid
+            WHERE (cc.path LIKE :cpath1 OR cc.path LIKE :cpath2) AND cm.module = :mid AND $wheres
             GROUP BY cm.module, c.id
 SQL;
 
-        $data = $DB->get_records_sql($sql, array(
-            "cpath1" => "%/" . $catid . "/%",
-            "cpath2" => "%/" . $catid,
-            "mid" => $moduleid
-        ));
-
-        // Grab a list of IDs to filter out.
-        $exclusions = static::get_exclusions_list();
-
-        // Filter out certain modules.
-        $filtereddata = array();
-        foreach ($data as $record) {
-            if (!isset($exclusions[$record->module]) || !in_array($record->instance, $exclusions[$record->module])) {
-                $filtereddata[] = $record;
-            }
-        }
-
-        return $filtereddata;
+        return $DB->get_records_sql($sql, $params);
     }
 
     /**
@@ -183,6 +170,27 @@ SQL;
             $forum => static::filter_list("forum", "News forum"),
             $lists => static::filter_list("aspirelists", "Reading list")
         );
+    }
+
+    /**
+     * Returns exclusion SQL and params.
+     */
+    private static function get_exclusions_sql() {
+        global $DB;
+
+        // Grab a list of IDs to filter out.
+        $exclusions = static::get_exclusions_list();
+
+        $params = array();
+        $wheres = array();
+        foreach ($exclusions as $module => $ids) {
+            list($isql, $iparams) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'param', false);
+            $wheres[] = 'cm.instance ' . $isql;
+            $params = array_merge($params, $iparams);
+        }
+        $wheres = implode(' AND ', $wheres);
+
+        return array($wheres, $params);
     }
 
     /**
