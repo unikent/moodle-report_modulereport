@@ -8,7 +8,7 @@ global $CFG, $DB;
 require_once(dirname(__FILE__) . '/../../config.php');
 
 if (!has_capability('moodle/site:config', \context_system::instance())) {
-	die(json_encode(array("error" => "Not allowed!")));
+	print_error("Not allowed!");
 }
 
 $cid = optional_param('cid', null, PARAM_INT);
