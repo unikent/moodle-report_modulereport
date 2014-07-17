@@ -89,6 +89,7 @@ if (!empty($cid) && !empty($mid)) {
 	}
 }
 
+echo $OUTPUT->header();
 echo json_encode(array(
 	"content" => \html_writer::table($table)
 ));
