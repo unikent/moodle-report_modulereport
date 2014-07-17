@@ -29,198 +29,189 @@ defined('MOODLE_INTERNAL') || die();
  * Reporting class
  */
 class reporting {
-	/**
-	 * Grab a list of module counts by categories.
-	 * 
-	 * @global $DB
-	 * @return array array (array("category",  "modules" => array("module" => "count", ...)), ...)
-	 */
-	public static function get_modules_by_category() {
-		global $DB;
+    /**
+     * Grab a list of module counts by categories.
+     * 
+     * @global $DB
+     * @return array array (array("category",  "modules" => array("module" => "count", ...)), ...)
+     */
+    public static function get_modules_by_category() {
+        global $DB;
 
-		$sql = <<<SQL
-			SELECT cm.id, cm.module, c.id cid, cm.instance, COUNT(cm.module) mcount, cc.path catpath
-				FROM {course_modules} cm
-			JOIN {course} c
-				ON cm.course = c.id
-			JOIN {course_categories} cc
-				ON c.category = cc.id
-			GROUP BY cm.module, cc.id, c.id
+        list($wheres, $params) = static::get_exclusions_sql();
+        $wheres = 'WHERE ' . $wheres;
+
+        $sql = <<<SQL
+            SELECT cm.id, c.id cid, cm.module, COUNT(cm.instance) mcount, cc.path catpath
+                FROM {course_modules} cm
+            JOIN {course} c
+                ON cm.course = c.id
+            JOIN {course_categories} cc
+                ON c.category = cc.id
+            $wheres
+            GROUP BY cm.module, cc.id, c.id
 SQL;
-		$records = $DB->get_records_sql($sql);
+        $records = $DB->get_records_sql($sql, $params);
 
-		// Stores an array of mappings for category ID -> category name.
-		$categories = static::get_categories();
+        // Stores an array of mappings for category ID -> category name.
+        $categories = static::get_categories();
 
-		// Stores an array of mappings for module ID -> module name.
-		$modules = static::get_modules();
+        // Stores an array of mappings for module ID -> module name.
+        $modules = static::get_modules();
 
-		// Placeholder set of 0 counts.
-		$module_counts = array_map(function($a) {
-			return 0;
-		}, $modules);
+        // Placeholder set of 0 counts.
+        $modulecounts = array_map(function($a) {
+            return 0;
+        }, $modules);
 
-		// Go through every category, setup the data array for it.
-		$data = array();
-		foreach ($categories as $catid => $catname) {
-			$data[$catid] = array(
-				"category" => $catname,
-				"modules" => $module_counts
-			);
-		}
+        // Go through every category, setup the data array for it.
+        $data = array();
+        foreach ($categories as $catid => $catname) {
+            $data[$catid] = array(
+                "category" => $catname,
+                "modules" => $modulecounts
+            );
+        }
 
-		// Grab a list of IDs to filter out.
-		$exclusions = static::get_exclusions_list();
+        // Update all the counts.
+        foreach ($records as $record) {
+            // Grab a list of categories to update.
+            $path = $record->catpath;
+            $paths = explode('/', $path);
+            $categories = array_filter($paths, "strlen");
 
-		// Update all the counts.
-		foreach ($records as $record) {
-			// Grab a list of categories to update.
-			$path = $record->catpath;
-			$paths = explode('/', $path);
-			$categories = array_filter($paths, "strlen");
+            foreach ($categories as $catid) {
+                // This totals the number of courses using the module, rather than the total
+                // number of instances (+= mcount)
+                // CR996.
+                $data[$catid]["modules"][$record->module]++;
+            }
+        }
 
-			foreach ($categories as $catid) {
-				// This totals the number of courses using the module, rather than the total
-				// number of instances (+= mcount)
-				// CR996
-				if (!isset($exclusions[$record->module]) || !in_array($record->instance, $exclusions[$record->module])) {
-					$data[$catid]["modules"][$record->module]++;
-				}
-			}
-		}
+        return $data;
+    }
 
-		return $data;
-	}
+    /**
+     * Returns a list of Module instances within a category
+     * 
+     * @global $DB
+     */
+    public static function get_instances_for_category($catid, $moduleid) {
+        global $DB;
 
-	/**
-	 * Returns a list of Module instances within a category
-	 * 
-	 * @global $DB
-	 */
-	public static function get_instances_for_category($catid, $moduleid) {
-		global $DB;
+        list($wheres, $params) = static::get_exclusions_sql();
+        $params["cpath1"] = "%/" . $catid . "/%";
+        $params["cpath2"] = "%/" . $catid;
+        $params["mid"] = $moduleid;
 
-		$sql = <<<SQL
-			SELECT cm.id, c.id as cid, cm.module, cm.instance, c.shortname, COUNT(cm.module) mcount
-				FROM {course_modules} cm
-			JOIN {course} c
-				ON cm.course = c.id
-			JOIN {course_categories} cc
-				ON c.category = cc.id
-			WHERE (cc.path LIKE :cpath1 OR cc.path LIKE :cpath2) AND cm.module = :mid
-			GROUP BY cm.module, c.id
+        $sql = <<<SQL
+            SELECT cm.id, c.id as cid, cm.module, cm.instance, c.shortname, COUNT(cm.module) mcount
+                FROM {course_modules} cm
+            JOIN {course} c
+                ON cm.course = c.id
+            JOIN {course_categories} cc
+                ON c.category = cc.id
+            WHERE (cc.path LIKE :cpath1 OR cc.path LIKE :cpath2) AND cm.module = :mid AND $wheres
+            GROUP BY cm.module, c.id
 SQL;
 
-		$data = $DB->get_records_sql($sql, array(
-			"cpath1" => "%/" . $catid . "/%",
-			"cpath2" => "%/" . $catid,
-			"mid" => $moduleid
-		));
+        return $DB->get_records_sql($sql, $params);
+    }
 
-		// Grab a list of IDs to filter out.
-		$exclusions = static::get_exclusions_list();
+    /**
+     * Returns a list of category ids and category names.
+     */
+    public static function get_categories() {
+        global $DB;
 
-		// Filter out certain modules.
-		$filtered_data = array();
-		foreach ($data as $record) {
-			if (!isset($exclusions[$record->module]) || !in_array($record->instance, $exclusions[$record->module])) {
-				$filtered_data[] = $record;
-			}
-		}
+        $records = $DB->get_records("course_categories", null, '', 'id, name');
 
-		return $filtered_data;
-	}
+        $data = array();
+        foreach ($records as $record) {
+            $data[$record->id] = $record->name;
+        }
 
-	/**
-	 * Return a count of all forum posts for a given course.
-	 */
-	public static function get_forum_post_count($course_id) {
-		global $DB;
+        return $data;
+    }
 
-		$sql = 'SELECT COUNT(fp.id) as count
-				FROM {forum_posts} fp
-				INNER JOIN {forum_discussions} fd
-					ON fd.id = fp.discussion
-				WHERE fd.course=:courseid';
+    /**
+     * Returns a list of modules.
+     */
+    public static function get_modules() {
+        global $DB;
 
-		return $DB->count_records_sql($sql, array(
-			"courseid" => $course_id
-		));
-	}
+        $records = $DB->get_records("modules", null, '', 'id, name');
 
-	/**
-	 * Returns a list of category ids and category names.
-	 */
-	public static function get_categories() {
-		global $DB;
+        $data = array();
+        foreach ($records as $record) {
+            $data[$record->id] = $record->name;
+        }
 
-		$records = $DB->get_records("course_categories", null, '', 'id, name');
+        return $data;
+    }
 
-		$data = array();
-		foreach ($records as $record) {
-			$data[$record->id] = $record->name;
-		}
+    /**
+     * Returns a list of modules we should exclude
+     */
+    private static function get_exclusions_list() {
+        global $DB;
 
-		return $data;
-	}
+        // Grab the ID of the forum module.
+        $forum = $DB->get_field('modules', 'id', array(
+            'name' => 'forum'
+        ));
 
-	/**
-	 * Returns a list of modules.
-	 */
-	public static function get_modules() {
-		global $DB;
+        // Grab the ID of the aspire lists module.
+        $lists = $DB->get_field('modules', 'id', array(
+            'name' => 'aspirelists'
+        ));
 
-		$records = $DB->get_records("modules", null, '', 'id, name');
+        return array(
+            $forum => static::filter_list("forum", "News forum"),
+            $lists => static::filter_list("aspirelists", "Reading list")
+        );
+    }
 
-		$data = array();
-		foreach ($records as $record) {
-			$data[$record->id] = $record->name;
-		}
+    /**
+     * Returns exclusion SQL and params.
+     */
+    private static function get_exclusions_sql() {
+        global $DB;
 
-		return $data;
-	}
+        // Grab a list of IDs to filter out.
+        $exclusions = static::get_exclusions_list();
 
-	/**
-	 * Returns a list of modules we should exclude
-	 */
-	private static function get_exclusions_list() {
-		global $DB;
+        $params = array();
+        $wheres = array();
+        foreach ($exclusions as $module => $ids) {
+            list($isql, $iparams) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'param', false);
+            $wheres[] = 'cm.instance ' . $isql;
+            $params = array_merge($params, $iparams);
+        }
+        $wheres = implode(' AND ', $wheres);
 
-		// Grab the ID of the forum module.
-		$forum = $DB->get_record('modules', array(
-			'name' => 'forum'
-		), 'id');
+        return array($wheres, $params);
+    }
 
-		// Grab the ID of the aspire lists module.
-		$lists = $DB->get_record('modules', array(
-			'name' => 'aspirelists'
-		), 'id');
+    /**
+     * Filter out default modules, this grabs a list of modules that need to be excluded.
+     * 
+     * @return boolean True if this is a default forum, else false.
+     */
+    private static function filter_list($tablename, $moduletitle) {
+        global $DB;
 
-		return array(
-			$forum->id => static::filter_list("forum", "News forum"),
-			$lists->id => static::filter_list("aspirelists", "Reading list")
-		);
-	}
+        // Grab a list of IDs we can exclude.
+        $records = $DB->get_records_sql("SELECT id FROM {".$tablename."} WHERE name = :title", array(
+            'title' => $moduletitle
+        ));
 
-	/**
-	 * Filter out default modules, this grabs a list of modules that need to be excluded.
-	 * 
-	 * @return boolean True if this is a default forum, else false.
-	 */
-	private static function filter_list($table_name, $module_title) {
-		global $DB;
+        // Map to an array.
+        $ids = array();
+        foreach ($records as $record) {
+            $ids[] = $record->id;
+        }
 
-		// Grab a list of IDs we can exclude.
-		$records = $DB->get_records_sql("SELECT id FROM {".$table_name."} WHERE name = :title", array(
-			'title' => $module_title
-		));
-
-		// Map to an array.
-		$ids = array();
-		foreach ($records as $record) {
-			$ids[] = $record->id;
-		}
-
-		return $ids;
-	}
+        return $ids;
+    }
 }
