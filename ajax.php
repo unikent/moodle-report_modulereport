@@ -45,7 +45,8 @@ if (!empty($cid) && !empty($mid)) {
 
 		if ($module->name == "forum") {
 			// Also add a cell for post counts.
-			$row[] = \report_modulereport\reporting::get_forum_post_count($item->cid);
+			$obj = new \report\studentactivity\data();
+			$row[] = $this->forum_count($item->cid);
 		}
 
 		$table->data[] = new \html_table_row($row);

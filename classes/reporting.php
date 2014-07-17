@@ -132,23 +132,6 @@ SQL;
 	}
 
 	/**
-	 * Return a count of all forum posts for a given course.
-	 */
-	public static function get_forum_post_count($course_id) {
-		global $DB;
-
-		$sql = 'SELECT COUNT(fp.id) as count
-				FROM {forum_posts} fp
-				INNER JOIN {forum_discussions} fd
-					ON fd.id = fp.discussion
-				WHERE fd.course=:courseid';
-
-		return $DB->count_records_sql($sql, array(
-			"courseid" => $course_id
-		));
-	}
-
-	/**
 	 * Returns a list of category ids and category names.
 	 */
 	public static function get_categories() {
