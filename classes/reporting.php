@@ -170,18 +170,18 @@ SQL;
         global $DB;
 
         // Grab the ID of the forum module.
-        $forum = $DB->get_record('modules', array(
+        $forum = $DB->get_field('modules', 'id', array(
             'name' => 'forum'
-        ), 'id');
+        ));
 
         // Grab the ID of the aspire lists module.
-        $lists = $DB->get_record('modules', array(
+        $lists = $DB->get_field('modules', 'id', array(
             'name' => 'aspirelists'
-        ), 'id');
+        ));
 
         return array(
-            $forum->id => static::filter_list("forum", "News forum"),
-            $lists->id => static::filter_list("aspirelists", "Reading list")
+            $forum => static::filter_list("forum", "News forum"),
+            $lists => static::filter_list("aspirelists", "Reading list")
         );
     }
 
