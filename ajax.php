@@ -18,9 +18,11 @@ define('AJAX_SCRIPT', true);
 
 require_once(dirname(__FILE__) . '/../../config.php');
 
-if (!has_capability('moodle/site:config', \context_system::instance())) {
-    print_error("Not allowed!");
-}
+require_login();
+require_capability('moodle/site:config', \context_system::instance());
+
+$PAGE->set_context(\context_system::instance());
+$PAGE->set_url(new \moodle_url('/report/modulereport/ajax.php'));
 
 $cid = optional_param('cid', null, PARAM_INT);
 $mid = optional_param('mid', null, PARAM_INT);
