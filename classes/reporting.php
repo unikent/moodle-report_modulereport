@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 class reporting {
     /**
      * Grab a list of module counts by categories.
-     * 
+     *
      * @global $DB
      * @return array array (array("category",  "modules" => array("module" => "count", ...)), ...)
      */
@@ -39,7 +39,11 @@ class reporting {
         global $DB;
 
         list($wheres, $params) = static::get_exclusions_sql();
-        $wheres = 'WHERE ' . $wheres;
+        if (!empty($wheres)) {
+            $wheres = 'WHERE ' . $wheres;
+        } else {
+            $wheres = '';
+        }
 
         $sql = <<<SQL
             SELECT cm.id, c.id cid, cm.module, COUNT(cm.instance) mcount, cc.path catpath
@@ -93,7 +97,7 @@ SQL;
 
     /**
      * Returns a list of Module instances within a category
-     * 
+     *
      * @global $DB
      */
     public static function get_instances_for_category($catid, $moduleid) {
@@ -104,6 +108,11 @@ SQL;
         $params["cpath2"] = "%/" . $catid;
         $params["mid"] = $moduleid;
 
+        $wheresql = '(cc.path LIKE :cpath1 OR cc.path LIKE :cpath2) AND cm.module = :mid ';
+        if (!empty($wheres)) {
+            $wheresql .= "AND $wheres";
+        }
+
         $sql = <<<SQL
             SELECT cm.id, c.id as cid, cm.module, cm.instance, c.shortname, COUNT(cm.module) mcount
                 FROM {course_modules} cm
@@ -111,7 +120,7 @@ SQL;
                 ON cm.course = c.id
             JOIN {course_categories} cc
                 ON c.category = cc.id
-            WHERE (cc.path LIKE :cpath1 OR cc.path LIKE :cpath2) AND cm.module = :mid AND $wheres
+            WHERE $wheresql
             GROUP BY cm.module, c.id
 SQL;
 
@@ -184,6 +193,10 @@ SQL;
         $params = array();
         $wheres = array();
         foreach ($exclusions as $module => $ids) {
+            if (empty($ids)) {
+                continue;
+            }
+
             list($isql, $iparams) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'param', false);
             $wheres[] = 'cm.instance ' . $isql;
             $params = array_merge($params, $iparams);
@@ -195,7 +208,7 @@ SQL;
 
     /**
      * Filter out default modules, this grabs a list of modules that need to be excluded.
-     * 
+     *
      * @return boolean True if this is a default forum, else false.
      */
     private static function filter_list($tablename, $moduletitle) {
