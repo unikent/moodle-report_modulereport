@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+debugging("report_modulereport is deprecated");
+
 $ADMIN->add('reports', new admin_externalpage('reportmodulereport', get_string('pluginname', 'report_modulereport'), "$CFG->wwwroot/report/modulereport/index.php",'report/modulereport:view'));
 
 // no report settings
