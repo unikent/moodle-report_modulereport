@@ -15,19 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Settings for the backups report
+ * Settings for the module report
  *
- * @package    report
- * @subpackage backups
- * @copyright  2007 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
+ * @package    report_modulereport
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-debugging("report_modulereport is deprecated");
-
-$ADMIN->add('reports', new admin_externalpage('reportmodulereport', get_string('pluginname', 'report_modulereport'), "$CFG->wwwroot/report/modulereport/index.php",'report/modulereport:view'));
-
-// no report settings
-$settings = null;
+if ($hassiteconfig) {
+  $ADMIN->add('reports', new admin_externalpage('reportmodulereport', get_string('pluginname', 'report_modulereport'), "$CFG->wwwroot/report/modulereport/index.php",'report/modulereport:view'));
+  
+  // no report settings
+  $settings = null;
+}
